@@ -6,7 +6,7 @@
 <title>Keyword Worth It?</title>
 <meta name="description" content="Paste your website and a keyword. See it rendered as the search result it would become, before you spend the hours writing it.">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#0d0717">
+<meta name="theme-color" content="#0e0b14">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Arimo:wght@400;600&display=swap" rel="stylesheet">
@@ -19,10 +19,11 @@
      Arcades are dark rooms, so this page is dark in both colour schemes.
      ──────────────────────────────────────────────────────────────────── */
   :root{
-    --room:#0d0717; --room-glow:#2a0f45;
+    --room:#0e0b14; --room-glow:#1f1530;
     --cab:#16102a; --cab-hi:#241a44; --cab-lo:#0b0716;
-    --pink:#ff3ea5; --cyan:#27e8ff; --yellow:#ffd23f; --green:#39ff88; --red:#ff4d4d; --orange:#ff9a3c;
-    --screen:#070b12; --phosphor:#c8ffe6; --phosphor-dim:#6fa893;
+    /* muted "after hours" palette — arcade colours, turned down for comfort */
+    --pink:#d0679b; --cyan:#6bbfcc; --yellow:#d9b85c; --green:#6fc494; --red:#d46a6a; --orange:#d69558;
+    --screen:#0a0e14; --phosphor:#c3d6cc; --phosphor-dim:#6d8a7d;
     --pixel:'Press Start 2P', ui-monospace, monospace;
     --crt:'VT323', ui-monospace, monospace;
   }
@@ -312,6 +313,51 @@
   }
   footer a{color:var(--cyan);text-decoration:none;border-bottom:2px solid var(--cyan);}
   footer a:hover{color:#fff;border-color:#fff;}
+
+
+  /* ── comfort pass ──────────────────────────────────────────────────
+     Keeps the arcade look but turns the lights down: no flicker or
+     blinking, soft glows instead of neon bloom, dimmer whites. */
+  body::after{opacity:.35;}
+  .cabinet{box-shadow:0 0 0 3px #000, 0 0 0 5px color-mix(in srgb, var(--pink) 70%, #000), 0 0 24px rgba(208,103,155,.12), 0 40px 80px -20px rgba(0,0,0,.9);}
+  .cabinet::before,.cabinet::after{opacity:.45;box-shadow:none;}
+  .marquee{background:radial-gradient(ellipse at 50% 130%, rgba(208,103,155,.22), transparent 60%), linear-gradient(180deg,#221733,#150f22);}
+  .marquee-top,.marquee-top .blink{text-shadow:none;}
+  .title{color:#ece4f2;animation:none;text-shadow:0 0 12px rgba(208,103,155,.35), 3px 3px 0 #3d2150;}
+  .title .q{text-shadow:3px 3px 0 #4a3a12;}
+  .screen{background:radial-gradient(ellipse at 50% 45%, #111820 0%, var(--screen) 75%);box-shadow:inset 0 0 60px rgba(0,0,0,.9), inset 0 0 0 2px #000;}
+  .screen::after{background:linear-gradient(160deg, rgba(255,255,255,.035) 0%, transparent 32%);animation:none;}
+  .hud,.hud span:last-child{text-shadow:none;}
+  h1{color:#e4e0ea;text-shadow:none;}
+  h1 em{text-shadow:none;}
+  .lede{text-shadow:none;color:#b8c9c0;}
+  .press{text-shadow:none;animation:breathe 3s ease-in-out infinite;}
+  @keyframes breathe{50%{opacity:.45;}}
+  .status-line .big{text-shadow:none;}
+  .loadbar{box-shadow:none;}
+  .error-box{box-shadow:none;color:#ecc9c9;}
+  .result-eyebrow{text-shadow:none;}
+  .snippet{background:#d8d6cf;box-shadow:0 0 0 3px #000, 5px 5px 0 0 color-mix(in srgb, var(--pink) 60%, #000);}
+  .snippet-title{color:#2a3fa0;}
+  .gauge{box-shadow:inset 0 0 18px rgba(0,0,0,.9);border-width:2px;}
+  .gauge:has(.good),.gauge:has(.bad){box-shadow:inset 0 0 18px rgba(0,0,0,.9);}
+  .gauge b{color:#e4e0ea;text-shadow:none;}
+  .call-strip{box-shadow:none;border-width:2px;}
+  .stamp{text-shadow:3px 3px 0 #000;}
+  #result.show .stamp{animation:land .5s steps(5) 1.5s both;}
+  .call-strip[data-verdict="Write it."] .stamp::before,
+  .call-strip[data-verdict="Write it."] .stamp::after{text-shadow:none;}
+  .call-strip p{color:#d8d4de;}
+  .reasoning .why-row{border:2px solid #5a5f80;box-shadow:none;background:#10132a;}
+  .reasoning .why-text{color:#d8d4de;}
+  .again{text-shadow:none;}
+  .stick::after{box-shadow:0 4px 0 #5a0735;}
+  .field input{text-shadow:none;}
+  .field:focus-within{box-shadow:inset 0 0 12px rgba(0,0,0,.9), 0 0 0 2px var(--green);}
+  .run-btn{background:radial-gradient(circle at 38% 30%,#e89a9a,var(--red) 50%,#7a2020 100%);box-shadow:0 8px 0 #4a1010, 0 0 0 5px #111, 0 0 0 7px #3a3a44, 0 10px 24px rgba(0,0,0,.6);}
+  .run-btn:active:not(:disabled){box-shadow:0 2px 0 #4a1010, 0 0 0 5px #111, 0 0 0 7px #3a3a44, 0 4px 10px rgba(0,0,0,.6);}
+  .slot i::after{text-shadow:none;animation:none;opacity:.8;}
+  footer{color:#8a8398;}
 
   @media (max-width:600px){
     body{padding-top:18px;}
