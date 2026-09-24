@@ -5,323 +5,312 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Keyword Worth It?</title>
 <meta name="description" content="Paste your website and a keyword. See it rendered as the search result it would become, before you spend the hours writing it.">
-<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#2f5a8f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   /* ────────────────────────────────────────────────────────────────────
-     A results page, stripped back. After a check, today's real top
-     results for the keyword are listed, and your post slides into the
-     list where the verdict puts it: among the top results (Write it),
-     at the edge of page one (Maybe), onto page two (Long shot), or off
-     the list entirely (Skip it). That's an illustration of the verdict,
-     not a rank prediction, and the page says so.
+     The keyword forecast. The verdict is the weather and the whole sky
+     changes with it: clear for Write it, partly cloudy for Maybe, a
+     storm for Long shot, fog for Skip it. Scores read like a forecast's
+     conditions, today's top results are the "rivals" tile, and
+     everything sits on frosted-glass tiles over the sky.
+     The sky is the theme, so white-on-sky text is used in both schemes;
+     only the idle sky switches to night in dark mode.
      ──────────────────────────────────────────────────────────────────── */
+  /* registered so the sky colours can transition between verdicts */
+  @property --sky-a{syntax:'<color>';inherits:true;initial-value:#27466f;}
+  @property --sky-b{syntax:'<color>';inherits:true;initial-value:#48709f;}
+  @property --sky-c{syntax:'<color>';inherits:true;initial-value:#86a9cf;}
   :root{
-    --bg:#ffffff; --bar:#ffffff; --field:#f1f3f4;
-    --ink:#202124; --ink-2:#4d5156; --ink-3:#70757a;
-    --line:#ebebeb; --line-2:#dadce0;
-    --link:#1a0dab; --visited:#681da8; --crumb:#202124;
-    --you:#1a73e8; --you-bg:#e8f0fe;
-    --write:#188038; --maybe:#b06000; --long:#c5221f; --skip:#80868b;
-    --shadow:0 1px 6px rgba(32,33,36,.18);
-    --font:'Arimo', Arial, Helvetica, sans-serif;
+    --font:-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
+    --text:#ffffff; --text-2:rgba(255,255,255,.72); --text-3:rgba(255,255,255,.55);
+    --tile:rgba(255,255,255,.14); --tile-line:rgba(255,255,255,.18);
+    --sky-a:#27466f; --sky-b:#48709f; --sky-c:#86a9cf;
   }
   @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --bg:#1f1f1f; --bar:#1f1f1f; --field:#303134;
-      --ink:#e8eaed; --ink-2:#bdc1c6; --ink-3:#9aa0a6;
-      --line:#3c4043; --line-2:#5f6368;
-      --link:#8ab4f8; --crumb:#dadce0;
-      --you:#8ab4f8; --you-bg:#233044;
-      --write:#81c995; --maybe:#fdd663; --long:#f28b82; --skip:#9aa0a6;
-      --shadow:0 1px 6px rgba(0,0,0,.5);
-    }
+    body[data-sky="idle"]{--sky-a:#0c1426;--sky-b:#1d2c4a;--sky-c:#3a4f74;}
   }
-  :root[data-theme="dark"]{
-    --bg:#1f1f1f; --bar:#1f1f1f; --field:#303134;
-    --ink:#e8eaed; --ink-2:#bdc1c6; --ink-3:#9aa0a6;
-    --line:#3c4043; --line-2:#5f6368;
-    --link:#8ab4f8; --crumb:#dadce0;
-    --you:#8ab4f8; --you-bg:#233044;
-    --write:#81c995; --maybe:#fdd663; --long:#f28b82; --skip:#9aa0a6;
-    --shadow:0 1px 6px rgba(0,0,0,.5);
-  }
+  body[data-sky="loading"]{--sky-a:#2c4466;--sky-b:#4d6788;--sky-c:#7d93ad;}
+  body[data-sky="clear"] {--sky-a:#1666c5;--sky-b:#3f95e6;--sky-c:#86c7f3;}
+  body[data-sky="cloudy"]{--sky-a:#46698f;--sky-b:#6f8fb2;--sky-c:#a4bad2;}
+  body[data-sky="storm"] {--sky-a:#161d27;--sky-b:#2a3542;--sky-c:#445263;}
+  body[data-sky="fog"]   {--sky-a:#5f676d;--sky-b:#838b90;--sky-c:#a9b0b3;}
 
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   html{-webkit-text-size-adjust:100%;}
-  body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.58;min-height:100vh;}
-  ::selection{background:var(--you-bg);}
-
-  /* ── top bar ───────────────────────────────────────────────────── */
-  .top{
-    position:sticky;top:0;z-index:10;background:var(--bar);border-bottom:1px solid var(--line);
-    display:flex;align-items:center;gap:28px;padding:18px 28px 16px;
+  body{
+    min-height:100vh;color:var(--text);font-family:var(--font);font-size:15px;line-height:1.45;
+    -webkit-font-smoothing:antialiased;background:var(--sky-a);padding:0 16px;
+    transition:--sky-a 1.4s ease, --sky-b 1.4s ease, --sky-c 1.4s ease;
   }
-  .logo{flex:none;font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--ink);white-space:nowrap;}
-  .logo b{color:var(--you);font-weight:700;}
+  ::selection{background:rgba(255,255,255,.35);}
+
+  /* ── the sky ───────────────────────────────────────────────────── */
+  .sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;
+    background:linear-gradient(180deg,var(--sky-a) 0%,var(--sky-b) 55%,var(--sky-c) 100%);}
+  .sun,.cloud,.rain,.flash,.fog{position:absolute;opacity:0;transition:opacity 1.2s ease;}
+
+  .sun{top:-140px;right:-120px;width:460px;height:460px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,240,190,.95) 0,rgba(255,220,130,.55) 18%,rgba(255,210,120,.18) 42%,transparent 68%);}
+  body[data-sky="clear"] .sun{opacity:1;animation:glow 8s ease-in-out infinite;}
+  @keyframes glow{50%{transform:scale(1.06);}}
+
+  .cloud{width:340px;height:110px;border-radius:110px;background:rgba(255,255,255,.55);filter:blur(18px);}
+  .cloud.c1{top:9%;left:-360px;animation:drift 70s linear infinite;}
+  .cloud.c2{top:30%;left:-360px;width:420px;height:130px;animation:drift 95s linear infinite -40s;}
+  .cloud.c3{top:58%;left:-360px;width:280px;animation:drift 80s linear infinite -65s;opacity:0;}
+  @keyframes drift{to{transform:translateX(calc(100vw + 760px));}}
+  body[data-sky="cloudy"] .cloud,body[data-sky="loading"] .cloud{opacity:.8;}
+  body[data-sky="loading"] .cloud{animation-duration:14s;}
+  body[data-sky="storm"] .cloud{opacity:.35;background:rgba(30,38,48,.9);}
+  body[data-sky="clear"] .cloud.c2{opacity:.3;}
+
+  .rain{inset:-20% 0 0 0;
+    background-image:
+      repeating-linear-gradient(105deg,transparent 0 18px,rgba(200,220,255,.28) 18px 19px,transparent 19px 46px),
+      repeating-linear-gradient(105deg,transparent 0 31px,rgba(200,220,255,.18) 31px 32px,transparent 32px 70px);
+    background-size:220px 180px, 300px 240px;}
+  body[data-sky="storm"] .rain{opacity:1;animation:fall .5s linear infinite;}
+  @keyframes fall{to{background-position:-40px 180px,-50px 240px;}}
+  .flash{inset:0;background:rgba(255,255,255,.9);}
+  body[data-sky="storm"] .flash{animation:lightning 9s infinite 2s;}
+  @keyframes lightning{0%,93%,100%{opacity:0;}94%{opacity:.5;}95%{opacity:0;}96.5%{opacity:.3;}97.5%{opacity:0;}}
+
+  .fog{left:-50%;width:200%;height:220px;border-radius:50%;background:rgba(235,238,240,.45);filter:blur(40px);}
+  .fog.f1{top:22%;animation:haze 26s ease-in-out infinite alternate;}
+  .fog.f2{top:60%;animation:haze 34s ease-in-out infinite alternate-reverse;}
+  @keyframes haze{from{transform:translateX(-12%);}to{transform:translateX(12%);}}
+  body[data-sky="fog"] .fog{opacity:1;}
+
+  /* ── app column ────────────────────────────────────────────────── */
+  .app{max-width:720px;margin:0 auto;padding:22px 0 56px;}
+
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;font-size:13px;color:var(--text-2);}
+  .top b{color:var(--text);font-weight:600;font-size:15px;}
+
   .search{
-    flex:1;max-width:690px;display:flex;align-items:center;min-width:0;
-    background:var(--bar);border:1px solid var(--line-2);border-radius:24px;height:46px;padding:0 6px 0 20px;
-    transition:box-shadow .15s ease, border-color .15s ease;
+    display:flex;align-items:center;gap:0;min-width:0;border-radius:14px;padding:5px 5px 5px 14px;
+    background:rgba(255,255,255,.16);backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);
+    border:1px solid var(--tile-line);
   }
-  .search:hover,.search:focus-within{box-shadow:var(--shadow);border-color:transparent;}
+  .search:focus-within{background:rgba(255,255,255,.24);}
   .search label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
-  .search input{min-width:0;border:none;background:transparent;color:var(--ink);font:inherit;font-size:16px;height:100%;}
+  .search svg.glass{flex:none;color:var(--text-2);margin-right:8px;}
+  .search input{min-width:0;border:none;background:transparent;color:var(--text);font:inherit;font-size:16px;padding:9px 0;}
+  .search input::placeholder{color:var(--text-3);}
   .search input:focus{outline:none;}
-  .search input::placeholder{color:var(--ink-3);}
   #keyword{flex:1;}
-  #website{flex:0 0 150px;color:var(--ink-2);font-size:14px;}
-  .site-chip{flex:none;display:flex;align-items:center;gap:6px;color:var(--ink-3);font-size:13px;margin-left:12px;padding-left:14px;border-left:1px solid var(--line-2);height:24px;}
-  .site-chip span{white-space:nowrap;}
+  .search .for{flex:none;color:var(--text-3);font-size:14px;margin:0 8px 0 14px;padding-left:14px;border-left:1px solid var(--tile-line);line-height:22px;}
+  #website{flex:0 0 150px;font-size:15px;color:var(--text-2);}
   .run-btn{
-    flex:none;width:38px;height:38px;margin-left:6px;border:none;border-radius:50%;background:transparent;color:var(--you);
-    display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s ease;
+    flex:none;height:38px;padding:0 16px;margin-left:6px;border:none;border-radius:10px;cursor:pointer;
+    background:rgba(255,255,255,.92);color:#1d3557;font:inherit;font-size:14px;font-weight:600;
+    display:flex;align-items:center;gap:8px;transition:transform .1s ease, background .15s ease;
   }
-  .run-btn:hover:not(:disabled){background:var(--field);}
-  .run-btn:focus-visible{outline:2px solid var(--you);outline-offset:1px;}
-  .run-btn:disabled{cursor:default;}
-  #runBtnLabel{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
-  .spinner{display:none;width:18px;height:18px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--you);animation:spin .7s linear infinite;}
-  .run-btn.loading .spinner{display:block;}
-  .run-btn.loading .glass{display:none;}
+  .run-btn:hover:not(:disabled){background:#fff;}
+  .run-btn:active:not(:disabled){transform:scale(.97);}
+  .run-btn:focus-visible{outline:2px solid #fff;outline-offset:3px;}
+  .run-btn:disabled{opacity:.7;cursor:default;}
+  .spinner{display:none;width:13px;height:13px;border-radius:50%;border:2px solid rgba(29,53,87,.3);border-top-color:#1d3557;animation:spin .7s linear infinite;}
+  .run-btn.loading .spinner{display:inline-block;}
   @keyframes spin{to{transform:rotate(360deg);}}
-  .by{flex:none;margin-left:auto;color:var(--ink-3);font-size:13px;white-space:nowrap;}
 
-  /* loading bar under the top bar, like a results page fetching */
-  .top::after{content:"";position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--you);opacity:0;}
-  body:has(.status-line.show) .top::after{opacity:1;animation:fetch 2.4s cubic-bezier(.3,.7,.4,1) infinite;}
-  @keyframes fetch{0%{width:0;left:0;}60%{width:70%;left:0;}100%{width:0;left:100%;}}
-
-  .meta{padding:12px 28px 0 calc(28px + 21px * 5.4 + 28px);color:var(--ink-3);font-size:13px;min-height:34px;}
-  .status-line{display:none;}
-  .status-line.show{display:inline;}
+  .status-line{display:none;margin:14px 2px 0;color:var(--text-2);font-size:14px;}
+  .status-line.show{display:block;}
   .status-line .dots::after{content:"…";}
+  .error-box{display:none;margin:14px 0 0;padding:12px 14px;border-radius:12px;background:rgba(120,20,20,.35);border:1px solid rgba(255,160,160,.35);font-size:14px;}
 
-  /* ── layout ────────────────────────────────────────────────────── */
-  .layout{--cols:minmax(0,652px) minmax(0,360px);--gap:76px;padding:6px 28px 60px calc(28px + 21px * 5.4 + 28px);}
+  /* ── hero: idle copy, then the "now" block ─────────────────────── */
+  .idle{text-align:center;padding:12vh 8px 4vh;}
+  body:not([data-sky="idle"]) .idle{display:none;}
+  .idle .icon{margin:0 auto 18px;opacity:.9;}
+  .idle h1{margin:0 auto 14px;max-width:18ch;font-size:clamp(30px,6.4vw,46px);line-height:1.1;font-weight:300;letter-spacing:-.02em;text-shadow:0 1px 12px rgba(0,0,0,.12);}
+  .idle h1 em{font-style:normal;font-weight:500;}
+  .idle .lede{margin:0 auto;max-width:42ch;color:var(--text-2);font-size:16px;}
+  .legend{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:26px;}
+  .legend span{padding:6px 12px;border-radius:999px;background:var(--tile);border:1px solid var(--tile-line);font-size:13px;color:var(--text-2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
 
-  .error-box{display:none;margin:6px 0 18px;color:var(--long);font-size:14px;}
-
-  /* empty state: what the tool is, set like a results page with no results yet */
-  .intro{padding-top:26px;max-width:600px;}
-  body:has(#result.show) .intro,
-  body:has(.status-line.show) .intro{display:none;}
-  .intro h1{font-size:28px;line-height:1.25;font-weight:400;letter-spacing:-.01em;margin:0 0 12px;color:var(--ink);}
-  .intro h1 em{font-style:normal;background:linear-gradient(transparent 62%, var(--you-bg) 62%);}
-  .intro .lede{margin:0 0 26px;font-size:16px;color:var(--ink-2);}
-  .intro ul{margin:0;padding:0;list-style:none;border-top:1px solid var(--line);}
-  .intro li{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);color:var(--ink-2);}
-  .intro li b{flex:none;width:86px;font-weight:600;}
-  .intro li:nth-child(1) b{color:var(--write);} .intro li:nth-child(2) b{color:var(--maybe);}
-  .intro li:nth-child(3) b{color:var(--long);} .intro li:nth-child(4) b{color:var(--skip);}
-
-  /* skeleton rows while loading */
-  .skeleton{display:none;max-width:652px;padding-top:10px;}
-  body:has(.status-line.show) .skeleton{display:block;}
-  .skeleton i{display:block;height:12px;border-radius:6px;background:var(--field);margin:14px 0;animation:shimmer 1.4s ease-in-out infinite;}
-  .skeleton i:nth-child(3n+1){width:32%;margin-top:30px;} .skeleton i:nth-child(3n+2){width:78%;height:18px;} .skeleton i:nth-child(3n){width:92%;}
-  @keyframes shimmer{50%{opacity:.45;}}
-
-  /* ── results ───────────────────────────────────────────────────── */
   #result{display:none;}
-  /* !important: the script sets display:block inline when showing the result */
-  #result.show{display:grid !important;grid-template-columns:var(--cols);gap:0 var(--gap);align-items:start;}
+  #result.show{display:block;}
 
-  .serp{list-style:none;margin:0;padding:0;}
-  .hit{padding:0 0 28px;}
-  #result.show .hit{animation:hit-in .35s ease both;animation-delay:calc(var(--i, 0) * 45ms);}
-  @keyframes hit-in{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
-  .crumb{display:flex;align-items:center;gap:12px;margin-bottom:4px;min-width:0;}
-  .fav{
-    flex:none;width:28px;height:28px;border-radius:50%;background:var(--field);border:1px solid var(--line);
-    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;
+  .call-strip{text-align:center;padding:7vh 8px 30px;}
+  .place{font-size:30px;font-weight:400;letter-spacing:-.01em;margin:0;text-shadow:0 1px 10px rgba(0,0,0,.12);}
+  .query{margin:2px 0 0;color:var(--text-2);font-size:15px;}
+  .wx{display:flex;align-items:center;justify-content:center;gap:14px;margin:18px 0 4px;}
+  .wx svg{display:none;flex:none;filter:drop-shadow(0 2px 10px rgba(0,0,0,.12));}
+  .call-strip[data-verdict="Write it."] .wx .i-clear,
+  .call-strip[data-verdict="Maybe."] .wx .i-cloudy,
+  .call-strip[data-verdict="Long shot."] .wx .i-storm,
+  .call-strip[data-verdict="Skip it."] .wx .i-fog{display:block;}
+  .stamp{font-size:clamp(46px,11vw,88px);line-height:1;font-weight:200;letter-spacing:-.04em;text-shadow:0 2px 18px rgba(0,0,0,.12);}
+  .call-strip p{margin:10px auto 0;max-width:40ch;font-size:17px;font-weight:500;}
+  #result.show .call-strip > *{animation:rise .7s cubic-bezier(.2,.8,.2,1) both;}
+  #result.show .call-strip > :nth-child(3){animation-delay:.08s;}
+  #result.show .call-strip > :nth-child(4){animation-delay:.16s;}
+  #result.show .call-strip > :nth-child(5){animation-delay:.24s;}
+  @keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+  /* ── tiles ─────────────────────────────────────────────────────── */
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .tile{
+    grid-column:span 2;border-radius:18px;padding:12px 16px 16px;background:var(--tile);border:1px solid var(--tile-line);
+    backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);
   }
-  .crumb-text{min-width:0;display:flex;flex-direction:column;line-height:1.25;}
-  .crumb-text b{font-weight:400;font-size:14px;color:var(--crumb);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .crumb-text span{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .hit h3{margin:0;font-size:20px;line-height:1.3;font-weight:400;color:var(--link);}
-  .rank{float:right;margin-left:12px;color:var(--ink-3);font-size:12px;font-variant-numeric:tabular-nums;}
+  .tile.half{grid-column:span 1;}
+  #result.show .tile{animation:rise .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.3s + var(--d,0) * 70ms);}
+  .tile-head{display:flex;align-items:center;gap:6px;margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--tile-line);
+    font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3);}
+  .tile-head svg{flex:none;}
 
-  .page-break{
-    display:flex;align-items:center;gap:14px;margin:4px 0 26px;color:var(--ink-3);font-size:13px;
-  }
-  .page-break::before,.page-break::after{content:"";flex:1;height:1px;background:var(--line);}
+  /* conditions — the scores, set like a 10-day forecast */
+  .gauge{display:grid;grid-template-columns:120px 48px 1fr;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--tile-line);}
+  .gauge:last-child{border-bottom:none;padding-bottom:2px;}
+  .gauge-label{font-size:16px;font-weight:500;}
+  .gauge b{font-size:16px;font-weight:500;text-align:right;font-variant-numeric:tabular-nums;}
+  .gauge-track{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,#ff6b6b,#ffd166 50%,#5fd68a);}
+  .gauge.inverse .gauge-track{background:linear-gradient(90deg,#5fd68a,#ffd166 50%,#ff6b6b);}
+  .gauge-fill{position:relative;height:100%;width:0;transition:width 1.1s cubic-bezier(.2,.8,.2,1) .5s;}
+  .gauge-fill::after{content:"";position:absolute;right:-6px;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(0,0,0,.18);}
 
-  /* your post — the one moving part */
-  .post-slot{display:grid;grid-template-rows:0fr;transition:grid-template-rows .7s cubic-bezier(.2,.8,.2,1);}
-  .post-slot.in{grid-template-rows:1fr;}
-  .post-slot > .post{min-height:0;overflow:hidden;}
-  .post{
-    --v:var(--write);
-    position:relative;
-    opacity:0;transform:translateX(28px);transition:opacity .45s ease .25s, transform .7s cubic-bezier(.2,.8,.2,1) .15s;
-  }
-  .post-slot.in .post{opacity:1;transform:none;}
-  .post-inner{padding:16px 18px 16px;margin-bottom:28px;border-radius:12px;background:var(--you-bg);}
-  .post-tag{
-    display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;font-size:12px;font-weight:600;color:var(--v);
-  }
-  .post-tag::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--v);}
-  .post[data-verdict="Maybe."]{--v:var(--maybe);}
-  .post[data-verdict="Long shot."]{--v:var(--long);}
-  .post[data-verdict="Skip it."]{--v:var(--skip);}
-  .post[data-verdict="Skip it."] .post-inner{filter:grayscale(1);opacity:.6;}
-  .post[data-verdict="Skip it."] .snippet-title{text-decoration:line-through;text-decoration-thickness:1px;}
-  .post .snippet-breadcrumb{display:flex;align-items:center;gap:12px;margin-bottom:4px;font-size:14px;color:var(--crumb);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .post .favicon{flex:none;width:28px;height:28px;border-radius:50%;background:var(--bg);border:1px solid var(--line-2);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--you);text-transform:uppercase;}
-  .snippet-title{margin:0 0 4px;font-size:20px;line-height:1.3;color:var(--link);font-weight:400;}
-  .snippet-desc{margin:0;color:var(--ink-2);font-size:14px;}
+  /* the would-be result */
+  .snippet{background:rgba(255,255,255,.95);color:#202124;border-radius:12px;padding:14px 16px;font-family:Arial,Helvetica,sans-serif;}
+  .snippet-breadcrumb{display:flex;align-items:center;gap:10px;font-size:13.5px;color:#202124;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .favicon{flex:none;width:26px;height:26px;border-radius:50%;background:#f1f3f4;border:1px solid #dadce0;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#5f6368;text-transform:uppercase;}
+  .snippet-title{margin:0 0 4px;font-size:19px;line-height:1.3;color:#1a0dab;}
+  .snippet-desc{margin:0;font-size:14px;line-height:1.55;color:#4d5156;}
 
-  .serp-note{margin:4px 0 0;color:var(--ink-3);font-size:13px;}
-  .serp-note b{color:var(--ink-2);font-weight:600;}
-  .illus{margin:10px 0 0;color:var(--ink-3);font-size:12px;}
+  /* rivals */
+  .rivals{list-style:none;margin:0;padding:0;counter-reset:r;}
+  .rivals li{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:15px;min-width:0;}
+  .rivals li::before{counter-increment:r;content:counter(r);flex:none;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.18);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+  .rivals li span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rivals .none{color:var(--text-2);font-size:14px;}
+  .rivals .none::before{display:none;}
+  .serp-note{margin:10px 0 0;font-size:12.5px;color:var(--text-3);}
+  .serp-note b{color:var(--text-2);font-weight:500;}
 
-  /* ── verdict panel (right column) ──────────────────────────────── */
-  .panel{position:sticky;top:104px;}
-  .card{border:1px solid var(--line);border-radius:12px;padding:20px 20px 18px;}
-  .call-strip{--v:var(--write);}
-  .call-strip.negative{--v:var(--long);}
-  .call-strip[data-verdict="Maybe."]{--v:var(--maybe);}
-  .call-strip[data-verdict="Skip it."]{--v:var(--skip);}
-  .panel-kicker{font-size:12px;color:var(--ink-3);margin-bottom:4px;}
-  .stamp{font-size:34px;line-height:1.15;font-weight:600;letter-spacing:-.02em;color:var(--v);margin-bottom:8px;}
-  .call-strip p{margin:0;font-size:15px;color:var(--ink-2);}
-
-  .scores{margin-top:18px;border-top:1px solid var(--line);}
-  .gauge{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 12px;padding:11px 0;border-bottom:1px solid var(--line);}
-  .gauge-label{color:var(--ink-2);font-size:14px;}
-  .gauge b{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;}
-  .gauge-track{grid-column:1/-1;height:4px;border-radius:2px;background:var(--field);overflow:hidden;}
-  .gauge-fill{height:100%;width:0;border-radius:2px;background:var(--ink-3);transition:width .9s cubic-bezier(.2,.8,.2,1) .3s;}
-  .gauge-fill.good{background:var(--write);} .gauge-fill.mid{background:var(--maybe);} .gauge-fill.bad{background:var(--long);}
-
-  .reasoning{display:none;margin-top:14px;}
+  /* why */
+  .reasoning{display:none;}
   .reasoning.show{display:block;}
-  .reasoning .why-row{padding:8px 0;font-size:13.5px;color:var(--ink-2);}
-  .reasoning .why-label{display:block;font-size:12px;color:var(--ink-3);}
-  .reasoning .why-text{display:block;}
+  .reasoning .why-row{padding:6px 0 8px;}
+  .reasoning .why-row + .why-row{border-top:1px solid var(--tile-line);padding-top:10px;}
+  .reasoning .why-label{display:block;font-size:12px;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+  .reasoning .why-text{font-size:14.5px;}
+  /* no reasoning from Jev: hide the "why" tile and let rivals take the row */
+  .tile.why:not(:has(.reasoning.show)){display:none;}
+  .tiles:not(:has(.reasoning.show)) .rivals-tile{grid-column:span 2;}
 
   .again{
-    margin-top:16px;padding:9px 16px;border:1px solid var(--line-2);border-radius:18px;background:transparent;color:var(--you);
-    font:inherit;font-size:14px;font-weight:500;cursor:pointer;transition:background .15s ease;
+    display:block;margin:22px auto 0;padding:11px 20px;border-radius:999px;border:1px solid var(--tile-line);
+    background:var(--tile);color:var(--text);font:inherit;font-size:14px;font-weight:500;cursor:pointer;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   }
-  .again:hover{background:var(--field);}
-  .again:focus-visible{outline:2px solid var(--you);outline-offset:2px;}
+  .again:hover{background:rgba(255,255,255,.24);}
+  .again:focus-visible{outline:2px solid #fff;outline-offset:3px;}
 
-  #result.show .panel{animation:hit-in .4s ease .1s both;}
+  footer{max-width:720px;margin:0 auto;padding:0 0 34px;text-align:center;font-size:13px;color:var(--text-3);}
+  footer a{color:var(--text-2);}
 
-  footer{padding:18px 28px;border-top:1px solid var(--line);background:var(--field);color:var(--ink-3);font-size:13px;}
-  footer a{color:var(--ink-2);}
-
-  /* ── smaller screens ───────────────────────────────────────────── */
-  @media (max-width:1100px){
-    .meta,.layout{padding-left:28px;}
-    .layout{--cols:minmax(0,652px) minmax(0,320px);--gap:40px;}
-  }
-  @media (max-width:860px){
-    .top{flex-wrap:wrap;gap:12px 16px;padding:14px 16px 12px;}
-    .by{display:none;}
-    .search{flex:1 1 100%;max-width:none;order:3;}
-    .meta{padding:10px 16px 0;}
-    .layout{padding:4px 16px 48px;}
-    #result.show{display:flex !important;flex-direction:column;}
-    .panel{position:static;order:-1;margin-bottom:26px;}
-  }
-  @media (max-width:520px){
-    .search{height:auto;flex-wrap:wrap;border-radius:18px;padding:4px 6px 4px 16px;}
-    #keyword{flex:1 1 calc(100% - 50px);height:44px;}
-    .site-chip{flex:1 1 100%;order:3;margin:0 0 6px;padding:6px 0 0;border-left:none;border-top:1px solid var(--line);height:auto;}
-    #website{flex:1;}
-    .hit h3,.snippet-title{font-size:18px;}
-    .intro h1{font-size:24px;}
+  @media (max-width:600px){
+    .search{flex-wrap:wrap;padding:4px 5px 5px 12px;}
+    #keyword{flex:1 1 calc(100% - 30px);}
+    .search .for{order:3;margin:0 8px 0 0;padding:0;border-left:none;}
+    #website{order:4;flex:1;}
+    .run-btn{order:5;}
+    .search::after{content:"";order:2;flex:1 1 100%;height:1px;background:var(--tile-line);margin:2px 0 4px -12px;}
+    .tile.half{grid-column:span 2;}
+    .gauge{grid-template-columns:112px 42px 1fr;gap:10px;}
+    .gauge-label{font-size:15px;white-space:nowrap;}
+    .place{font-size:26px;}
+    .top span:last-child{display:none;}
   }
   @media (prefers-reduced-motion: reduce){
-    *,*::before,*::after{animation-duration:.01ms !important;animation-delay:0ms !important;transition-duration:.01ms !important;transition-delay:0ms !important;}
+    *,*::before,*::after{animation-duration:.01ms !important;animation-delay:0ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;transition-delay:0ms !important;}
   }
 </style>
 </head>
-<body>
+<body data-sky="idle">
 
-<header class="top">
-  <span class="logo">Keyword Worth It<b>?</b></span>
-  <form class="search" id="queryForm" onsubmit="return false;" role="search">
-    <label for="keyword">keyword</label>
-    <input type="text" id="keyword" placeholder="best cold email software" value="best cold email software" autocomplete="off" spellcheck="false">
-    <span class="site-chip">
-      <span>for</span>
-      <label for="website">site</label>
-      <input type="text" id="website" placeholder="salesrobot.co" value="salesrobot.co" autocomplete="url" spellcheck="false" autocapitalize="off">
-    </span>
-    <button class="run-btn" id="runBtn" type="button" title="run the query">
-      <span class="spinner"></span>
-      <svg class="glass" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5 20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      <span id="runBtnLabel">run the query</span>
-    </button>
-  </form>
-  <span class="by">from the SERPent team</span>
-</header>
-
-<div class="meta">
-  <span class="status-line" id="statusLine" role="status" aria-live="polite"><span id="statusText">reading the site</span><span class="dots"></span></span>
-  <span id="serpMeta"></span>
+<div class="sky" aria-hidden="true">
+  <div class="sun"></div>
+  <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+  <div class="fog f1"></div><div class="fog f2"></div>
+  <div class="rain"></div>
+  <div class="flash"></div>
 </div>
 
-<main class="layout">
+<div class="app">
+  <div class="top"><b>Keyword Worth It?</b><span>the keyword forecast · from the SERPent team</span></div>
+
+  <form class="search" id="queryForm" onsubmit="return false;" role="search">
+    <svg class="glass" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5 20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <label for="keyword">keyword</label>
+    <input type="text" id="keyword" placeholder="best cold email software" value="best cold email software" autocomplete="off" spellcheck="false">
+    <span class="for">for</span>
+    <label for="website">site</label>
+    <input type="text" id="website" placeholder="salesrobot.co" value="salesrobot.co" autocomplete="url" spellcheck="false" autocapitalize="off">
+    <button class="run-btn" id="runBtn" type="button"><span class="spinner"></span><span id="runBtnLabel">run the query</span></button>
+  </form>
+
+  <div class="status-line" id="statusLine" role="status" aria-live="polite"><span id="statusText">reading the site</span><span class="dots"></span></div>
   <div class="error-box" id="errorBox" role="alert"></div>
 
-  <section class="intro">
+  <section class="idle">
+    <svg class="icon" width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="10" fill="#FFD76A"/><path d="M24 6v4M24 38v4M6 24h4M38 24h4M11.3 11.3l2.8 2.8M33.9 33.9l2.8 2.8M11.3 36.7l2.8-2.8M33.9 14.1l2.8-2.8" stroke="#FFD76A" stroke-width="2.5" stroke-linecap="round"/><path d="M22 52h26a10 10 0 0 0 0-20 13 13 0 0 0-25 3.5A8.3 8.3 0 0 0 22 52Z" fill="#fff" fill-opacity=".95"/></svg>
     <h1>Would this <em>actually</em> rank, or is it a waste of an afternoon?</h1>
     <p class="lede">Run the keyword like a query. You'll get back the result it would actually become — before you spend the hours writing it.</p>
-    <ul>
-      <li><b>Write it.</b><span>Your post slides in among today's top results.</span></li>
-      <li><b>Maybe.</b><span>It lands on the edge of page one.</span></li>
-      <li><b>Long shot.</b><span>It drops to page two, behind bigger sites.</span></li>
-      <li><b>Skip it.</b><span>Wrong audience, so ranking wouldn't matter.</span></li>
-    </ul>
+    <div class="legend"><span>☀ Write it</span><span>⛅ Maybe</span><span>⛈ Long shot</span><span>🌫 Skip it</span></div>
   </section>
 
-  <div class="skeleton" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-
   <section id="result" aria-live="polite">
-    <div class="results">
-      <ol class="serp" id="serpList"></ol>
+    <div class="call-strip" id="callStrip">
+      <p class="place" id="nowPlace"></p>
+      <p class="query" id="nowQuery"></p>
+      <div class="wx">
+        <svg class="i-clear" width="56" height="56" viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="12" fill="#FFD76A"/><path d="M32 8v6M32 50v6M8 32h6M50 32h6M15 15l4.2 4.2M44.8 44.8 49 49M15 49l4.2-4.2M44.8 19.2 49 15" stroke="#FFD76A" stroke-width="3" stroke-linecap="round"/></svg>
+        <svg class="i-cloudy" width="60" height="56" viewBox="0 0 64 60" fill="none" aria-hidden="true"><circle cx="22" cy="20" r="10" fill="#FFD76A"/><path d="M20 50h28a11 11 0 0 0 0-22 14 14 0 0 0-27 4 9 9 0 0 0-1 18Z" fill="#fff"/></svg>
+        <svg class="i-storm" width="60" height="60" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M18 38h30a11 11 0 0 0 0-22 14 14 0 0 0-27 4 9 9 0 0 0-3 18Z" fill="#dfe6ee"/><path d="m34 36-7 12h7l-4 11 12-15h-8l5-8" fill="#FFD76A"/><path d="M20 44l-3 7M47 44l-3 7" stroke="#9cc3ff" stroke-width="3" stroke-linecap="round"/></svg>
+        <svg class="i-fog" width="60" height="56" viewBox="0 0 64 60" fill="none" aria-hidden="true"><path d="M8 22h40M14 32h44M6 42h38M16 52h34" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-opacity=".9"/></svg>
+      </div>
+      <div class="stamp"><span id="callWord"></span></div>
+      <p id="callRest"></p>
+    </div>
 
-      <div class="post-slot" id="postSlot">
-        <article class="post" id="post">
-          <div class="post-inner">
-            <div class="post-tag" id="postTag">your post</div>
-            <div class="snippet-breadcrumb"><span class="favicon" id="snippetFavicon" aria-hidden="true"></span><span id="snippetBreadcrumb"></span></div>
-            <p class="snippet-title" id="snippetTitle"></p>
-            <p class="snippet-desc" id="snippetDesc"></p>
-          </div>
+    <div class="tiles">
+      <div class="tile" style="--d:0">
+        <div class="tile-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>conditions</div>
+        <div class="gauge"><span class="gauge-label">Intent</span><b id="scoreIntent">-</b><div class="gauge-track"><div class="gauge-fill" id="barIntent"></div></div></div>
+        <div class="gauge"><span class="gauge-label">Buying stage</span><b id="scoreBuying">-</b><div class="gauge-track"><div class="gauge-fill" id="barBuying"></div></div></div>
+        <div class="gauge inverse"><span class="gauge-label">Competition</span><b id="scoreCompetitive">-</b><div class="gauge-track"><div class="gauge-fill" id="barCompetitive"></div></div></div>
+      </div>
+
+      <div class="tile" style="--d:1">
+        <div class="tile-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="2"/><path d="M7 9h10M7 13h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>here's what that post would look like</div>
+        <article class="snippet">
+          <div class="snippet-breadcrumb"><span class="favicon" id="snippetFavicon" aria-hidden="true"></span><span id="snippetBreadcrumb"></span></div>
+          <p class="snippet-title" id="snippetTitle"></p>
+          <p class="snippet-desc" id="snippetDesc"></p>
         </article>
       </div>
 
-      <p class="serp-note" id="serpNote"></p>
-      <p class="illus">Where your post appears shows the verdict, not a predicted rank.</p>
+      <div class="tile half rivals-tile" style="--d:2">
+        <div class="tile-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>today's rivals</div>
+        <ol class="rivals" id="rivalList"></ol>
+        <p class="serp-note" id="serpNote"></p>
+      </div>
+
+      <div class="tile half why" style="--d:3">
+        <div class="tile-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>why</div>
+        <div class="reasoning" id="reasoning"></div>
+      </div>
     </div>
 
-    <aside class="panel">
-      <div class="card">
-        <div class="call-strip" id="callStrip">
-          <div class="panel-kicker">verdict</div>
-          <div class="stamp"><span id="callWord"></span></div>
-          <p id="callRest"></p>
-        </div>
-        <div class="scores">
-          <div class="gauge"><span class="gauge-label">intent</span><b id="scoreIntent">-</b><div class="gauge-track"><div class="gauge-fill" id="barIntent"></div></div></div>
-          <div class="gauge"><span class="gauge-label">buying stage</span><b id="scoreBuying">-</b><div class="gauge-track"><div class="gauge-fill" id="barBuying"></div></div></div>
-          <div class="gauge"><span class="gauge-label">competition</span><b id="scoreCompetitive">-</b><div class="gauge-track"><div class="gauge-fill" id="barCompetitive"></div></div></div>
-        </div>
-        <div class="reasoning" id="reasoning"></div>
-        <button class="again" id="runAgainBtn" type="button">run another keyword</button>
-      </div>
-    </aside>
+    <button class="again" id="runAgainBtn" type="button">run another keyword</button>
   </section>
-</main>
+</div>
 
 <footer>
   From <a href="https://serpent.up.railway.app" target="_blank" rel="noopener">SERPent</a>, the keyword-to-blog pipeline — this is the sniff test that comes before it writes anything.
@@ -391,6 +380,7 @@
   }
 
   function showError(msg){
+    setSky('idle');
     errorBox.textContent = msg;
     errorBox.style.display = 'block';
   }
@@ -445,83 +435,39 @@
     });
   }
 
-  // ── Live results list ────────────────────────────────────────────
-  // Today's real top results (from the backend's Serper lookup) are listed,
-  // and "your post" slides into the list at a spot that illustrates the
-  // verdict. That spot is NOT a predicted rank: the page says so, and the
-  // real results keep their real positions (#1, #2, ...).
-  const serpList = $('serpList');
-  const serpMeta = $('serpMeta');
-  const postSlot = $('postSlot');
-  const postEl = $('post');
-  const postTag = $('postTag');
+  // ── The forecast ─────────────────────────────────────────────────
+  // The verdict sets the sky (clear / cloudy / storm / fog) and the
+  // "today's rivals" tile lists the real top results from the backend.
+  const nowPlace = $('nowPlace');
+  const nowQuery = $('nowQuery');
+  const rivalList = $('rivalList');
+  const SKY = { 'Write it.': 'clear', 'Maybe.': 'cloudy', 'Long shot.': 'storm', 'Skip it.': 'fog' };
   let lastTopResults = [];
-  let postTimer = null;
 
-  function hitEl(r, i){
-    const li = document.createElement('li');
-    li.className = 'hit';
-    li.style.setProperty('--i', i);
-    const rank = document.createElement('span');
-    rank.className = 'rank';
-    rank.textContent = '#' + (i + 1);
-    const crumb = document.createElement('div');
-    crumb.className = 'crumb';
-    const fav = document.createElement('span');
-    fav.className = 'fav';
-    fav.textContent = String(r.domain || '·').charAt(0);
-    const text = document.createElement('span');
-    text.className = 'crumb-text';
-    const name = document.createElement('b');
-    name.textContent = r.domain;
-    const url = document.createElement('span');
-    url.textContent = 'https://' + r.domain;
-    text.append(name, url);
-    crumb.append(fav, text);
-    const h3 = document.createElement('h3');
-    h3.textContent = r.title || r.domain;
-    li.append(rank, crumb, h3);
-    return li;
-  }
+  function setSky(name){ document.body.dataset.sky = name; }
 
-  function placePost(word, keyword, grounded){
-    const results = grounded ? lastTopResults.filter(function(r){ return r && r.domain; }).slice(0, 10) : [];
-    const n = results.length;
-    let at, tag, divider = '';
-    if (word === 'Write it.'){ at = Math.min(2, n); tag = 'your post · could compete here'; }
-    else if (word === 'Maybe.'){ at = Math.max(0, n - 1); tag = 'your post · on the edge of page one'; }
-    else if (word === 'Long shot.'){ at = n; tag = 'your post · page two'; divider = n ? 'page 2' : ''; }
-    else { at = n; tag = 'your post · wrong audience'; divider = n ? 'not in the running' : ''; }
+  function setForecast(word, keyword, domain, grounded){
+    setSky(SKY[word] || 'idle');
+    callStrip.dataset.verdict = word;
+    nowPlace.textContent = domain;
+    nowQuery.textContent = '“' + keyword + '”';
 
-    if (!n) tag = 'your post';  // no live list, so no position to describe
-    serpList.textContent = '';
-    postEl.dataset.verdict = word;
-    postTag.textContent = tag;
-    const slotLi = document.createElement('li');
-    slotLi.className = 'slot-li';
-    results.forEach(function(r, i){
-      if (i === at) serpList.append(slotLi);
-      serpList.append(hitEl(r, i));
-    });
-    if (at >= n){
-      if (divider){
-        const br = document.createElement('li');
-        br.className = 'page-break';
-        br.textContent = divider;
-        serpList.append(br);
-      }
-      serpList.append(slotLi);
+    rivalList.textContent = '';
+    const results = grounded ? lastTopResults.filter(function(r){ return r && r.domain; }).slice(0, 6) : [];
+    if (!results.length){
+      const li = document.createElement('li');
+      li.className = 'none';
+      li.textContent = 'Live results unavailable right now.';
+      rivalList.append(li);
+      return;
     }
-    slotLi.append(postSlot);
-
-    serpMeta.textContent = n
-      ? "Today's top " + n + ' results for “' + keyword + '”'
-      : 'Live results unavailable, so this shows your post on its own';
-
-    clearTimeout(postTimer);
-    postSlot.classList.remove('in');
-    if (reduceMotion){ postSlot.classList.add('in'); return; }
-    postTimer = setTimeout(function(){ postSlot.classList.add('in'); }, 300 + n * 45);
+    results.forEach(function(r){
+      const li = document.createElement('li');
+      const span = document.createElement('span');
+      span.textContent = r.domain;
+      li.append(span);
+      rivalList.append(li);
+    });
   }
 
   async function run(){
@@ -539,6 +485,7 @@
     runBtn.classList.add('loading');
     runBtnLabel.textContent = 'running...';
     startStatus();
+    setSky('loading');
 
     try{
       const res = await fetch(RELAY_URL, {
@@ -669,7 +616,7 @@
 
     resultEl.classList.add('show');
     resultEl.style.display = 'block';
-    placePost(word, keyword, serpGrounded);
+    setForecast(word, keyword, domain, serpGrounded);
     [scoreIntent, scoreBuying, scoreCompetitive].forEach(function(el){ countUp(el, el.textContent, 1100); });
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -683,6 +630,7 @@
   runAgainBtn.addEventListener('click', function(){
     resultEl.classList.remove('show');
     resultEl.style.display = 'none';
+    setSky('idle');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     keywordEl.focus();
     keywordEl.select();
