@@ -5,198 +5,330 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Keyword Worth It?</title>
 <meta name="description" content="Paste your website and a keyword. See it rendered as the search result it would become, before you spend the hours writing it.">
+<meta name="color-scheme" content="light dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600;1,9..144,700&family=Space+Mono:wght@400;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:oklch(97% 0.008 85); --paper-raised:oklch(100% 0 0);
-    --ink:oklch(21% 0.03 280); --ink-soft:oklch(48% 0.018 280);
-    --line:oklch(90% 0.008 85); --line-strong:oklch(83% 0.012 85);
-    --link:oklch(52% 0.155 265); --link-dim:oklch(70% 0.08 265);
-    --gold:oklch(48% 0.11 152); --gold-soft:oklch(95% 0.03 150);
-    --brick:oklch(50% 0.145 25); --brick-soft:oklch(95% 0.025 25);
-    --ring: oklch(52% 0.155 265 / 0.35);
-    --shadow-xs: 0 1px 2px oklch(20% 0.03 280 / 0.05);
-    --shadow-sm: 0 1px 2px oklch(20% 0.03 280 / 0.04), 0 2px 6px oklch(20% 0.03 280 / 0.05);
+    --paper:oklch(97.2% 0.009 85); --paper-raised:oklch(99.4% 0.004 85); --paper-sunk:oklch(94.6% 0.012 85);
+    --ink:oklch(20% 0.025 275); --ink-soft:oklch(46% 0.018 275); --ink-faint:oklch(62% 0.014 275);
+    --line:oklch(89.5% 0.01 85); --line-strong:oklch(81% 0.014 85);
+    --link:oklch(45% 0.13 265);
+    --gold:oklch(46% 0.1 152); --gold-soft:oklch(94% 0.03 150);
+    --amber:oklch(58% 0.12 70); --amber-soft:oklch(95% 0.035 80);
+    --brick:oklch(48% 0.14 25); --brick-soft:oklch(95% 0.025 25);
+    --accent:oklch(52% 0.09 60);
+    --ring: oklch(45% 0.13 265 / 0.28);
+    --shadow-sm: 0 1px 0 oklch(100% 0 0 / 0.7) inset, 0 1px 2px oklch(20% 0.03 280 / 0.04), 0 8px 24px -12px oklch(20% 0.03 280 / 0.12);
+    --shadow-lg: 0 1px 2px oklch(20% 0.03 280 / 0.04), 0 24px 48px -24px oklch(20% 0.03 280 / 0.18);
+    --grain-opacity: 0.35;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --paper:oklch(17% 0.014 280); --paper-raised:oklch(22% 0.016 280);
-      --ink:oklch(93% 0.008 85); --ink-soft:oklch(67% 0.016 280);
-      --line:oklch(30% 0.016 280); --line-strong:oklch(38% 0.018 280);
-      --link:oklch(75% 0.11 265); --link-dim:oklch(52% 0.09 265);
-      --gold:oklch(76% 0.12 150); --gold-soft:oklch(27% 0.035 150);
-      --brick:oklch(72% 0.13 25); --brick-soft:oklch(27% 0.04 25);
-      --ring: oklch(75% 0.11 265 / 0.4);
-      --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.25);
-      --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.2), 0 2px 8px oklch(0% 0 0 / 0.25);
+      --paper:oklch(16.5% 0.012 275); --paper-raised:oklch(20.5% 0.014 275); --paper-sunk:oklch(14.5% 0.012 275);
+      --ink:oklch(93% 0.01 85); --ink-soft:oklch(70% 0.014 275); --ink-faint:oklch(54% 0.014 275);
+      --line:oklch(28% 0.014 275); --line-strong:oklch(36% 0.016 275);
+      --link:oklch(78% 0.1 265);
+      --gold:oklch(77% 0.12 150); --gold-soft:oklch(26% 0.035 150);
+      --amber:oklch(80% 0.12 75); --amber-soft:oklch(27% 0.04 75);
+      --brick:oklch(73% 0.13 25); --brick-soft:oklch(26% 0.04 25);
+      --accent:oklch(78% 0.09 70);
+      --ring: oklch(78% 0.1 265 / 0.35);
+      --shadow-sm: 0 1px 0 oklch(100% 0 0 / 0.04) inset, 0 8px 24px -12px oklch(0% 0 0 / 0.5);
+      --shadow-lg: 0 24px 48px -24px oklch(0% 0 0 / 0.6);
+      --grain-opacity: 0.18;
     }
   }
   :root[data-theme="dark"]{
-    --paper:oklch(17% 0.014 280); --paper-raised:oklch(22% 0.016 280);
-    --ink:oklch(93% 0.008 85); --ink-soft:oklch(67% 0.016 280);
-    --line:oklch(30% 0.016 280); --line-strong:oklch(38% 0.018 280);
-    --link:oklch(75% 0.11 265); --link-dim:oklch(52% 0.09 265);
-    --gold:oklch(76% 0.12 150); --gold-soft:oklch(27% 0.035 150);
-    --brick:oklch(72% 0.13 25); --brick-soft:oklch(27% 0.04 25);
-    --ring: oklch(75% 0.11 265 / 0.4);
-    --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.25);
-    --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.2), 0 2px 8px oklch(0% 0 0 / 0.25);
+    --paper:oklch(16.5% 0.012 275); --paper-raised:oklch(20.5% 0.014 275); --paper-sunk:oklch(14.5% 0.012 275);
+    --ink:oklch(93% 0.01 85); --ink-soft:oklch(70% 0.014 275); --ink-faint:oklch(54% 0.014 275);
+    --line:oklch(28% 0.014 275); --line-strong:oklch(36% 0.016 275);
+    --link:oklch(78% 0.1 265);
+    --gold:oklch(77% 0.12 150); --gold-soft:oklch(26% 0.035 150);
+    --amber:oklch(80% 0.12 75); --amber-soft:oklch(27% 0.04 75);
+    --brick:oklch(73% 0.13 25); --brick-soft:oklch(26% 0.04 25);
+    --accent:oklch(78% 0.09 70);
+    --ring: oklch(78% 0.1 265 / 0.35);
+    --shadow-sm: 0 1px 0 oklch(100% 0 0 / 0.04) inset, 0 8px 24px -12px oklch(0% 0 0 / 0.5);
+    --shadow-lg: 0 24px 48px -24px oklch(0% 0 0 / 0.6);
+    --grain-opacity: 0.18;
   }
 
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
   body{
     background:var(--paper); color:var(--ink);
     font-family:'Public Sans', system-ui, sans-serif;
-    padding:56px 20px 70px;
+    font-feature-settings:"kern","liga";
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    padding:40px 20px 64px; min-height:100vh; position:relative;
   }
-  .wrap{max-width:600px;margin:0 auto;}
+  /* paper grain — a whisper of texture so the page reads as print, not screen */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:var(--grain-opacity);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .45 0 0 0 0 .4 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:620px;margin:0 auto;position:relative;z-index:1;}
 
-  ::selection{background:var(--link); color:var(--paper);}
+  ::selection{background:var(--ink); color:var(--paper);}
 
-  .masthead{display:flex;align-items:center;justify-content:space-between;margin-bottom:50px;border-bottom:1px solid var(--line); padding-bottom:16px;}
-  .masthead-brand{display:flex;align-items:center;gap:9px;}
+  .mono{font-family:'IBM Plex Mono', ui-monospace, monospace;}
+  .smallcaps{font-family:'IBM Plex Mono', ui-monospace, monospace;font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;}
+
+  /* masthead — set like the nameplate of a small, serious newspaper */
+  .masthead{margin-bottom:64px;}
+  .masthead-top{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    color:var(--ink-faint);padding-bottom:10px;
+  }
+  .masthead-brand{
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    padding:14px 0 13px;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);
+    position:relative;
+  }
+  .masthead-brand::after{content:"";position:absolute;left:0;right:0;bottom:-4px;border-bottom:1px solid var(--ink);opacity:0.9;}
   .masthead-mark{flex:none;color:var(--gold);}
-  .masthead-name{font-family:'Fraunces',serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;}
-  .masthead-tag{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);}
+  .masthead-name{
+    font-family:'Fraunces',serif;font-weight:600;font-size:22px;letter-spacing:-0.005em;
+    font-variation-settings:"opsz" 72, "SOFT" 30;
+  }
+  .masthead-tag{color:var(--ink-faint);}
+
+  .kicker{color:var(--accent);margin:0 0 18px;display:flex;align-items:center;gap:10px;}
+  .kicker::before{content:"";width:22px;height:1px;background:currentColor;}
 
   h1{
-    font-family:'Fraunces',serif;font-weight:600;font-size:clamp(32px,7.2vw,50px);
-    line-height:1.1;margin:0 0 18px;letter-spacing:-0.015em;max-width:15ch;
+    font-family:'Fraunces',serif;font-weight:400;font-size:clamp(34px,7.4vw,56px);
+    font-variation-settings:"opsz" 144, "SOFT" 20;
+    line-height:1.04;margin:0 0 22px;letter-spacing:-0.022em;max-width:14ch;text-wrap:balance;
   }
-  h1 em{font-style:italic;font-weight:700;color:var(--gold);}
-  p.lede{font-size:16.5px;line-height:1.65;color:var(--ink-soft);margin:0 0 40px;max-width:46ch;}
+  h1 em{font-style:italic;font-weight:500;color:var(--gold);font-variation-settings:"opsz" 144, "SOFT" 60;}
+  p.lede{
+    font-size:17px;line-height:1.65;color:var(--ink-soft);margin:0 0 44px;max-width:44ch;text-wrap:pretty;
+  }
 
   /* the query bar — the hero interaction, two columns: site / keyword */
   .query-bar{
     display:flex;align-items:stretch;
-    background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:14px;
-    margin-bottom:10px;box-shadow:var(--shadow-sm);
+    background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:16px;
+    margin-bottom:14px;box-shadow:var(--shadow-sm);padding:5px;
+    transition:border-color .2s ease, box-shadow .2s ease;
   }
-  .field{display:flex;flex-direction:column;gap:6px;padding:12px 18px;flex:1;min-width:0;}
+  .field{display:flex;flex-direction:column;gap:7px;padding:13px 18px 14px;flex:1;min-width:0;border-radius:12px;transition:background .2s ease;}
   .field:first-child{flex:0.85;}
   .field label{
-    font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.06em;
-    text-transform:uppercase;color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:500;letter-spacing:0.14em;
+    text-transform:uppercase;color:var(--ink-faint);transition:color .2s ease;
   }
-  .field-divider{width:1px;background:var(--line);margin:10px 0;flex:none;}
+  .field-divider{width:1px;background:var(--line);margin:12px 0;flex:none;}
   .field-input{display:flex;align-items:center;gap:8px;min-width:0;}
-  .field-input svg{flex:none;color:var(--ink-soft);}
+  .field-input svg{flex:none;color:var(--ink-faint);}
   .field:focus-within label{color:var(--link);}
   .query-syntax{
-    font-family:'Space Mono',monospace;font-size:14.5px;color:var(--ink-soft);white-space:nowrap;
+    font-family:'Fraunces',serif;font-size:20px;line-height:1;color:var(--ink-faint);white-space:nowrap;
+    font-variation-settings:"opsz" 72;
   }
   .field-input input{
-    font-family:'Space Mono',monospace;font-size:14.5px;color:var(--ink);
+    font-family:'IBM Plex Mono',monospace;font-size:14.5px;color:var(--ink);
     background:transparent;border:none;padding:0;min-width:0;width:100%;caret-color:var(--link);
   }
   .field-input input:focus{outline:none;}
-  .field-input input::placeholder{color:var(--ink-soft);opacity:0.6;}
-  .field:has(input:focus){background:var(--paper);border-radius:10px;}
-  .query-bar:focus-within{border-color:var(--link); box-shadow:var(--shadow-sm), 0 0 0 3px var(--ring);}
+  .field-input input::placeholder{color:var(--ink-faint);opacity:0.7;}
+  .field:has(input:focus){background:var(--paper-sunk);}
+  .query-bar:focus-within{border-color:var(--link); box-shadow:var(--shadow-sm), 0 0 0 4px var(--ring);}
 
-  .run-row{display:flex;justify-content:flex-end;margin-bottom:6px;}
-  .run-btn{
-    font-family:'Space Mono',monospace;font-size:13px;font-weight:700;
-    background:var(--ink);color:var(--paper);border:none;border-radius:10px;
-    padding:11px 20px;cursor:pointer;display:flex;align-items:center;gap:8px;
-    box-shadow:var(--shadow-xs);
-    transition:opacity .15s ease, transform .1s ease;
+  .run-row{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px;}
+  .run-hint{color:var(--ink-faint);}
+  .run-hint kbd{
+    font-family:inherit;font-size:10px;border:1px solid var(--line-strong);border-bottom-width:2px;
+    border-radius:4px;padding:1px 5px;margin:0 2px;color:var(--ink-soft);background:var(--paper-raised);
   }
-  .run-btn:hover:not(:disabled){opacity:0.88;}
-  .run-btn:active:not(:disabled){transform:translateY(1px);}
-  .run-btn:focus-visible{outline:2px solid var(--link); outline-offset:2px;}
-  .run-btn:disabled{opacity:0.5;cursor:default;}
-  .spinner{width:11px;height:11px;border-radius:50%;border:2px solid oklch(100% 0 0 / 0.35);border-top-color:var(--paper);animation:spin 0.7s linear infinite;display:none;}
+  .run-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;letter-spacing:0.02em;
+    background:var(--ink);color:var(--paper);border:none;border-radius:999px;
+    padding:12px 22px 12px 24px;cursor:pointer;display:flex;align-items:center;gap:10px;
+    box-shadow:0 1px 0 oklch(100% 0 0 / 0.12) inset, 0 6px 16px -8px oklch(20% 0.03 280 / 0.5);
+    transition:transform .15s ease, box-shadow .2s ease, opacity .15s ease;
+  }
+  .run-btn .arrow{transition:transform .2s ease;}
+  .run-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 1px 0 oklch(100% 0 0 / 0.12) inset, 0 10px 22px -10px oklch(20% 0.03 280 / 0.55);}
+  .run-btn:hover:not(:disabled) .arrow{transform:translateX(3px);}
+  .run-btn:active:not(:disabled){transform:translateY(0);}
+  .run-btn:focus-visible{outline:2px solid var(--link); outline-offset:3px;}
+  .run-btn:disabled{opacity:0.6;cursor:default;}
+  .spinner{width:11px;height:11px;border-radius:50%;border:1.5px solid oklch(100% 0 0 / 0.3);border-top-color:var(--paper);animation:spin 0.7s linear infinite;display:none;}
   .run-btn.loading .spinner{display:inline-block;}
+  .run-btn.loading .arrow{display:none;}
   @keyframes spin{to{transform:rotate(360deg);}}
-  .status-line{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);text-align:right;margin-bottom:10px;display:none;}
+  .status-line{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);text-align:right;
+    margin:10px 0;display:none;
+  }
   .status-line.show{display:block;}
+  .status-line .dots::after{content:"";animation:dots 1.2s steps(4,end) infinite;}
+  @keyframes dots{0%{content:"";}25%{content:".";}50%{content:"..";}75%{content:"...";}}
 
   .error-box{
-    background:var(--brick-soft);color:var(--brick);
-    padding:13px 16px;border-radius:10px;font-size:13.5px;line-height:1.6;margin-top:18px;display:none;
+    background:var(--brick-soft);color:var(--brick);border-left:2px solid var(--brick);
+    padding:13px 16px;border-radius:4px 10px 10px 4px;font-size:13.5px;line-height:1.6;margin-top:18px;display:none;
   }
 
-  /* result rendered as a fake search snippet */
-  #result{display:none;margin-top:44px;}
-  #result.show{display:block;animation:reveal 0.4s cubic-bezier(0.16, 1, 0.3, 1);}
-  @keyframes reveal{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  /* result rendered as a fake search snippet, set on a sheet of card stock */
+  #result{display:none;margin-top:56px;}
+  #result.show{display:block;animation:reveal 0.55s cubic-bezier(0.16, 1, 0.3, 1);}
+  @keyframes reveal{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
-  .result-eyebrow{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);margin-bottom:18px;}
+  .result-eyebrow{
+    color:var(--ink-faint);margin-bottom:16px;display:flex;align-items:center;gap:12px;
+  }
+  .result-eyebrow::after{content:"";flex:1;height:1px;background:var(--line);}
 
-  .snippet{border-top:1px solid var(--line);padding-top:20px;}
-  .snippet-breadcrumb{font-size:13px;color:var(--ink-soft);margin-bottom:4px;}
+  .sheet{
+    background:var(--paper-raised);border:1px solid var(--line);border-radius:18px;
+    box-shadow:var(--shadow-lg);overflow:hidden;
+  }
+  .snippet{padding:26px 28px 24px;}
+  .snippet-breadcrumb{
+    font-size:12.5px;color:var(--ink-soft);margin-bottom:6px;display:flex;align-items:center;gap:8px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .favicon{
+    flex:none;width:22px;height:22px;border-radius:50%;background:var(--paper-sunk);border:1px solid var(--line);
+    display:inline-flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-weight:600;font-size:11px;color:var(--ink-soft);text-transform:uppercase;
+  }
   .snippet-title{
-    font-family:'Fraunces',serif;font-weight:600;font-size:21px;line-height:1.32;
-    color:var(--link);margin:0 0 8px;
+    font-family:'Fraunces',serif;font-weight:500;font-size:23px;line-height:1.28;letter-spacing:-0.01em;
+    font-variation-settings:"opsz" 48;
+    color:var(--link);margin:0 0 10px;text-wrap:balance;
   }
-  .snippet-desc{font-size:15px;line-height:1.6;margin:0 0 14px;max-width:56ch;}
-  .snippet-meta{
-    font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);
-    display:flex;flex-wrap:wrap;gap:14px;
-  }
-  .snippet-meta b{color:var(--ink);font-weight:700;}
+  .snippet-desc{font-size:15px;line-height:1.65;margin:0;max-width:56ch;color:var(--ink);text-wrap:pretty;}
 
-  .serp-note{font-size:12.5px;color:var(--ink-soft);margin:10px 0 0;line-height:1.6;}
+  /* the three scores as instrument readings */
+  .snippet-meta{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    border-top:1px solid var(--line);background:var(--paper-sunk);
+  }
+  .gauge{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;}
+  .gauge + .gauge{border-left:1px solid var(--line);}
+  .gauge-label{color:var(--ink-faint);}
+  .gauge b{
+    font-family:'Fraunces',serif;font-weight:500;font-size:28px;line-height:1;color:var(--ink);
+    font-variation-settings:"opsz" 72;font-variant-numeric:tabular-nums lining-nums;letter-spacing:-0.01em;
+  }
+  .gauge-track{height:3px;border-radius:3px;background:var(--line);overflow:hidden;}
+  .gauge-fill{height:100%;width:0;border-radius:3px;background:var(--ink-soft);transition:width .9s cubic-bezier(0.16, 1, 0.3, 1) .15s;}
+  .gauge-fill.good{background:var(--gold);}
+  .gauge-fill.mid{background:var(--amber);}
+  .gauge-fill.bad{background:var(--brick);}
+
+  .notes{padding:18px 28px 22px;border-top:1px solid var(--line);}
+  .serp-note{font-size:12.5px;color:var(--ink-soft);margin:0;line-height:1.65;display:flex;gap:9px;}
+  .serp-note::before{
+    content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-top:6px;
+    box-shadow:0 0 0 3px var(--gold-soft);
+  }
+  .serp-note.estimate::before{background:var(--amber);box-shadow:0 0 0 3px var(--amber-soft);}
   .serp-note b{color:var(--ink);font-weight:600;}
   .serp-note.estimate{font-style:italic;}
 
-  .reasoning{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:none;}
+  .reasoning{margin-top:16px;padding-top:16px;border-top:1px dashed var(--line-strong);display:none;}
   .reasoning.show{display:block;}
-  .reasoning .why-row{display:flex;gap:8px;font-size:13px;line-height:1.55;margin-bottom:8px;}
+  .reasoning .why-row{display:flex;gap:14px;font-size:13.5px;line-height:1.6;margin-bottom:10px;}
   .reasoning .why-row:last-child{margin-bottom:0;}
   .reasoning .why-label{
-    font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.04em;
-    text-transform:uppercase;color:var(--ink-soft);flex:none;width:88px;padding-top:2px;
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:500;letter-spacing:0.14em;
+    text-transform:uppercase;color:var(--ink-faint);flex:none;width:96px;padding-top:3px;
   }
-  .reasoning .why-text{color:var(--ink-soft);}
+  .reasoning .why-text{color:var(--ink-soft);text-wrap:pretty;}
 
   /* the verdict, staged as an ink stamp — the one decisive moment on the page */
   .call-strip{
-    margin-top:32px;padding:26px 4px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
-    display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+    --stamp:var(--gold);
+    margin-top:36px;padding:30px 4px;border-top:1px solid var(--ink);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:28px;flex-wrap:wrap;
   }
+  .call-strip.negative{--stamp:var(--brick);}
+  .call-strip[data-verdict="Maybe."]{--stamp:var(--amber);}
   .stamp{
     flex:none;position:relative;
     font-family:'Fraunces',serif;font-style:italic;font-weight:700;
-    font-size:25px;letter-spacing:0.01em;line-height:1;
-    padding:11px 20px;border:2.5px solid var(--gold);border-radius:4px;
-    color:var(--gold);transform:rotate(-3deg);
-    text-shadow:0 0 0.5px currentColor;
+    font-variation-settings:"opsz" 144, "SOFT" 0;
+    font-size:30px;letter-spacing:0.005em;line-height:1;
+    padding:14px 24px 15px;border:2.5px solid var(--stamp);border-radius:6px;
+    color:var(--stamp);transform:rotate(-4deg);
+    /* uneven ink: a stamp never lands perfectly */
+    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='80'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 2.05'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
+            mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='80'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 2.05'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
   }
   .stamp::after{
-    content:"";position:absolute;inset:3px;border:1px solid currentColor;border-radius:2px;opacity:0.35;
+    content:"";position:absolute;inset:3px;border:1px solid currentColor;border-radius:3px;opacity:0.4;
     pointer-events:none;
   }
-  .call-strip.negative .stamp{border-color:var(--brick);color:var(--brick);}
-  .call-strip p{margin:0;font-size:14.5px;line-height:1.6;color:var(--ink-soft);flex:1;min-width:200px;}
+  #result.show .stamp{animation:stamp-in .5s cubic-bezier(0.2, 1.4, 0.4, 1) .35s both;}
+  @keyframes stamp-in{
+    0%{opacity:0;transform:rotate(-9deg) scale(1.7);filter:blur(2px);}
+    60%{opacity:1;filter:blur(0);}
+    100%{opacity:1;transform:rotate(-4deg) scale(1);}
+  }
+  .call-strip p{
+    margin:0;font-family:'Fraunces',serif;font-size:18px;line-height:1.5;color:var(--ink);flex:1;min-width:220px;
+    font-variation-settings:"opsz" 24;text-wrap:pretty;
+  }
 
   .again{
-    display:inline-block;margin-top:24px;font-family:'Space Mono',monospace;font-size:12.5px;
-    color:var(--ink-soft);background:none;border:none;cursor:pointer;text-decoration:underline;
-    text-underline-offset:3px;padding:0;transition:color .15s ease;
+    display:inline-flex;align-items:center;gap:8px;margin-top:26px;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+    color:var(--ink-soft);background:none;border:none;cursor:pointer;
+    padding:0;transition:color .15s ease;
   }
+  .again span{text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:4px;transition:text-decoration-color .15s ease;}
   .again:hover{color:var(--ink);}
-  .again:focus-visible{outline:2px solid var(--link); outline-offset:3px;}
+  .again:hover span{text-decoration-color:currentColor;}
+  .again:focus-visible{outline:2px solid var(--link); outline-offset:3px;border-radius:2px;}
 
-  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-soft);line-height:1.7;}
-  footer a{color:var(--link);font-weight:600;text-decoration:none;}
-  footer a:hover{text-decoration:underline; text-underline-offset:3px;}
+  footer{
+    margin-top:80px;padding-top:18px;border-top:1px solid var(--ink);
+    font-size:13px;color:var(--ink-soft);line-height:1.7;position:relative;
+  }
+  footer::before{content:"";position:absolute;left:0;right:0;top:3px;border-top:1px solid var(--ink);opacity:0.9;}
+  footer p{margin:0;max-width:52ch;}
+  footer a{color:var(--ink);font-weight:600;text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px;}
+  footer a:hover{text-decoration-color:currentColor;}
 
-  @media (max-width:480px){
+  @media (max-width:520px){
+    body{padding:28px 16px 56px;}
+    .masthead{margin-bottom:48px;}
+    .masthead-top .issue{display:none;}
+    .masthead-top{justify-content:center;}
     .query-bar{flex-direction:column;}
     .field-divider{width:auto;height:1px;margin:0 18px;}
     .field, .field:first-child{flex:none;}
+    .run-hint{display:none;}
+    .run-row{justify-content:flex-end;}
+    .snippet{padding:22px 20px 20px;}
+    .notes{padding:16px 20px 20px;}
+    .gauge{padding:14px 12px 16px;}
+    .gauge b{font-size:23px;}
+    .gauge-label{font-size:9.5px;letter-spacing:0.1em;}
+    .reasoning .why-row{flex-direction:column;gap:2px;}
+    .call-strip{gap:20px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:0.01ms !important;animation-delay:0ms !important;transition-duration:0.01ms !important;}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <div class="masthead">
+  <header class="masthead">
+    <div class="masthead-top">
+      <span class="smallcaps issue" id="issueDate"></span>
+      <span class="smallcaps masthead-tag">from the SERPent team</span>
+    </div>
     <div class="masthead-brand">
       <svg class="masthead-mark" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
         <path d="M3 6c0-2 1.6-3.5 3.5-3.5S10 4 10 6s-1.6 3.5-3.5 3.5S3 11 3 13s1.6 3.5 3.5 3.5S10 15 10 13s1.6-3.5 3.5-3.5S17 11 17 13s-1.6 3.5-3.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
@@ -204,66 +336,86 @@
       </svg>
       <div class="masthead-name">Keyword Worth It?</div>
     </div>
-    <div class="masthead-tag">from the SERPent team</div>
-  </div>
+  </header>
 
-  <h1>Would this <em>actually</em> rank, or is it a waste of an afternoon?</h1>
-  <p class="lede">Run the keyword like a query. You'll get back the result it would actually become — before you spend the hours writing it.</p>
+  <main>
+    <p class="kicker smallcaps">The sniff test</p>
+    <h1>Would this <em>actually</em> rank, or is it a waste of an afternoon?</h1>
+    <p class="lede">Run the keyword like a query. You'll get back the result it would actually become — before you spend the hours writing it.</p>
 
-  <div class="query-bar">
-    <div class="field">
-      <label for="website">site</label>
-      <div class="field-input">
-        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.2" cy="6.2" r="5.2" stroke="currentColor" stroke-width="1.5"/><line x1="9.9" y1="9.9" x2="13.5" y2="13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        <input type="text" id="website" placeholder="salesrobot.co" value="salesrobot.co">
+    <form class="query-bar" id="queryForm" onsubmit="return false;">
+      <div class="field">
+        <label for="website">site</label>
+        <div class="field-input">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="6.2" cy="6.2" r="5.2" stroke="currentColor" stroke-width="1.4"/><line x1="9.9" y1="9.9" x2="13.5" y2="13.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <input type="text" id="website" placeholder="salesrobot.co" value="salesrobot.co" autocomplete="url" spellcheck="false" autocapitalize="off">
+        </div>
       </div>
-    </div>
-    <div class="field-divider" aria-hidden="true"></div>
-    <div class="field">
-      <label for="keyword">keyword</label>
-      <div class="field-input">
-        <span class="query-syntax">&ldquo;</span>
-        <input type="text" id="keyword" placeholder="best cold email software" value="best cold email software">
-        <span class="query-syntax">&rdquo;</span>
+      <div class="field-divider" aria-hidden="true"></div>
+      <div class="field">
+        <label for="keyword">keyword</label>
+        <div class="field-input">
+          <span class="query-syntax" aria-hidden="true">&ldquo;</span>
+          <input type="text" id="keyword" placeholder="best cold email software" value="best cold email software" autocomplete="off" spellcheck="false">
+          <span class="query-syntax" aria-hidden="true">&rdquo;</span>
+        </div>
       </div>
+    </form>
+
+    <div class="run-row">
+      <span class="run-hint smallcaps">press <kbd>Enter</kbd> to run</span>
+      <button class="run-btn" id="runBtn" type="button">
+        <span class="spinner"></span>
+        <span id="runBtnLabel">run the query</span>
+        <svg class="arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h9.5M7.5 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </div>
-  </div>
+    <div class="status-line" id="statusLine" role="status" aria-live="polite"><span id="statusText">reading the site</span><span class="dots"></span></div>
 
-  <div class="run-row">
-    <button class="run-btn" id="runBtn" type="button">
-      <span class="spinner"></span>
-      <span id="runBtnLabel">run the query</span>
-    </button>
-  </div>
-  <div class="status-line" id="statusLine">reading the site...</div>
+    <div class="error-box" id="errorBox" role="alert"></div>
 
-  <div class="error-box" id="errorBox"></div>
+    <section id="result" aria-live="polite">
+      <div class="result-eyebrow smallcaps">here's what that post would look like</div>
+      <article class="sheet">
+        <div class="snippet">
+          <div class="snippet-breadcrumb"><span class="favicon" id="snippetFavicon" aria-hidden="true"></span><span id="snippetBreadcrumb"></span></div>
+          <p class="snippet-title" id="snippetTitle"></p>
+          <p class="snippet-desc" id="snippetDesc"></p>
+        </div>
+        <div class="snippet-meta">
+          <div class="gauge">
+            <span class="gauge-label smallcaps">intent</span>
+            <b id="scoreIntent">-</b>
+            <div class="gauge-track"><div class="gauge-fill" id="barIntent"></div></div>
+          </div>
+          <div class="gauge">
+            <span class="gauge-label smallcaps">buying stage</span>
+            <b id="scoreBuying">-</b>
+            <div class="gauge-track"><div class="gauge-fill" id="barBuying"></div></div>
+          </div>
+          <div class="gauge">
+            <span class="gauge-label smallcaps">competition</span>
+            <b id="scoreCompetitive">-</b>
+            <div class="gauge-track"><div class="gauge-fill" id="barCompetitive"></div></div>
+          </div>
+        </div>
+        <div class="notes">
+          <p class="serp-note" id="serpNote"></p>
+          <div class="reasoning" id="reasoning"></div>
+        </div>
+      </article>
 
-  <div id="result">
-    <div class="result-eyebrow">here's what that post would look like</div>
-    <div class="snippet">
-      <div class="snippet-breadcrumb" id="snippetBreadcrumb"></div>
-      <p class="snippet-title" id="snippetTitle"></p>
-      <p class="snippet-desc" id="snippetDesc"></p>
-      <div class="snippet-meta">
-        <span>intent <b id="scoreIntent">-</b></span>
-        <span>buying stage <b id="scoreBuying">-</b></span>
-        <span>competition <b id="scoreCompetitive">-</b></span>
+      <div class="call-strip" id="callStrip">
+        <div class="stamp"><span id="callWord"></span></div>
+        <p id="callRest"></p>
       </div>
-      <p class="serp-note" id="serpNote"></p>
-      <div class="reasoning" id="reasoning"></div>
-    </div>
 
-    <div class="call-strip" id="callStrip">
-      <div class="stamp"><span id="callWord"></span></div>
-      <p id="callRest"></p>
-    </div>
-
-    <button class="again" id="runAgainBtn" type="button">run another keyword</button>
-  </div>
+      <button class="again" id="runAgainBtn" type="button"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M10 6H2M5 2.5 1.5 6 5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>run another keyword</span></button>
+    </section>
+  </main>
 
   <footer>
-    From <a href="https://serpent.up.railway.app" target="_blank" rel="noopener">SERPent</a>, the keyword-to-blog pipeline — this is the sniff test that comes before it writes anything.
+    <p>From <a href="https://serpent.up.railway.app" target="_blank" rel="noopener">SERPent</a>, the keyword-to-blog pipeline — this is the sniff test that comes before it writes anything.</p>
   </footer>
 
 </div>
@@ -278,20 +430,48 @@
   const runBtn = $('runBtn');
   const runBtnLabel = $('runBtnLabel');
   const statusLine = $('statusLine');
+  const statusText = $('statusText');
   const errorBox = $('errorBox');
   const resultEl = $('result');
   const snippetBreadcrumb = $('snippetBreadcrumb');
+  const snippetFavicon = $('snippetFavicon');
   const snippetTitle = $('snippetTitle');
   const snippetDesc = $('snippetDesc');
   const scoreIntent = $('scoreIntent');
   const scoreBuying = $('scoreBuying');
   const scoreCompetitive = $('scoreCompetitive');
+  const barIntent = $('barIntent');
+  const barBuying = $('barBuying');
+  const barCompetitive = $('barCompetitive');
   const serpNote = $('serpNote');
   const reasoningEl = $('reasoning');
   const callStrip = $('callStrip');
   const callWord = $('callWord');
   const callRest = $('callRest');
   const runAgainBtn = $('runAgainBtn');
+
+  // Masthead dateline.
+  try {
+    $('issueDate').textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  } catch (e) {}
+
+  // The request runs three steps server-side (site → today's top ten → verdict);
+  // the status line walks through them so the wait reads as work, not a hang.
+  const STATUS_STEPS = ['reading the site', "checking today's top ten", 'weighing the verdict'];
+  let statusTimer = null;
+  function startStatus(){
+    let i = 0;
+    statusText.textContent = STATUS_STEPS[0];
+    statusLine.classList.add('show');
+    clearInterval(statusTimer);
+    statusTimer = setInterval(function(){
+      if (i < STATUS_STEPS.length - 1){ i++; statusText.textContent = STATUS_STEPS[i]; }
+    }, 2600);
+  }
+  function stopStatus(){
+    clearInterval(statusTimer);
+    statusLine.classList.remove('show');
+  }
 
   function showError(msg){
     errorBox.textContent = msg;
@@ -336,7 +516,20 @@
     return website.replace(/^https?:\/\//i, '').replace(/\/$/, '');
   }
 
+  // Gauge bars: purely presentational. For intent and buying stage, higher is
+  // better; for competition, higher is worse — the colour follows that.
+  function setGauge(bar, value, higherIsBetter){
+    const good = higherIsBetter ? value >= 0.6 : value < 0.5;
+    const bad = higherIsBetter ? value < 0.45 : value >= 0.65;
+    bar.className = 'gauge-fill ' + (good ? 'good' : bad ? 'bad' : 'mid');
+    bar.style.width = '0';
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){ bar.style.width = Math.max(2, Math.round(value * 100)) + '%'; });
+    });
+  }
+
   async function run(){
+    if (runBtn.disabled) return;
     hideError();
     resultEl.classList.remove('show');
     resultEl.style.display = 'none';
@@ -349,7 +542,7 @@
     runBtn.disabled = true;
     runBtn.classList.add('loading');
     runBtnLabel.textContent = 'running...';
-    statusLine.classList.add('show');
+    startStatus();
 
     try{
       const res = await fetch(RELAY_URL, {
@@ -364,7 +557,7 @@
       runBtn.disabled = false;
       runBtn.classList.remove('loading');
       runBtnLabel.textContent = 'run the query';
-      statusLine.classList.remove('show');
+      stopStatus();
 
       if (!res.ok){
         showError(data.error || ('Something went wrong (' + res.status + '). Try again.'));
@@ -392,7 +585,7 @@
       runBtn.disabled = false;
       runBtn.classList.remove('loading');
       runBtnLabel.textContent = 'run the query';
-      statusLine.classList.remove('show');
+      stopStatus();
       showError('Could not reach the checker. Try again in a moment.');
     }
   }
@@ -401,6 +594,9 @@
     scoreIntent.textContent = Math.round(hasIntent * 100) + '%';
     scoreBuying.textContent = Math.round(buyingStage * 100) + '%';
     scoreCompetitive.textContent = Math.round(tooCompetitive * 100) + '%';
+    setGauge(barIntent, hasIntent, true);
+    setGauge(barBuying, buyingStage, true);
+    setGauge(barCompetitive, tooCompetitive, false);
 
     reasons = reasons || {};
     const rows = [
@@ -420,7 +616,7 @@
 
     if (serpGrounded && serpTopDomains.length){
       serpNote.className = 'serp-note';
-      serpNote.innerHTML = 'Competition checked against today\'s top results — including <b>' + serpTopDomains.slice(0, 3).join('</b>, <b>') + '</b>.';
+      serpNote.innerHTML = '<span>Competition checked against today\'s top results — including <b>' + serpTopDomains.slice(0, 3).map(escapeHtml).join('</b>, <b>') + '</b>.</span>';
     } else {
       serpNote.className = 'serp-note estimate';
       serpNote.textContent = 'Competition is an estimate — not checked against live search results.';
@@ -429,6 +625,7 @@
     const domain = domainFor(website);
     const slug = slugFor(keyword);
     snippetBreadcrumb.textContent = domain + ' › blog › ' + slug;
+    snippetFavicon.textContent = (domain.replace(/^www\./i, '').charAt(0) || '·');
 
     let verdictCls, word, rest, title, desc;
 
@@ -467,6 +664,7 @@
     snippetTitle.textContent = title;
     snippetDesc.textContent = desc;
     callStrip.className = 'call-strip' + (verdictCls ? ' ' + verdictCls : '');
+    callStrip.dataset.verdict = word;
     callWord.textContent = word;
     callRest.textContent = rest;
 
@@ -476,11 +674,17 @@
   }
 
   runBtn.addEventListener('click', run);
+  [websiteEl, keywordEl].forEach(function(el){
+    el.addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){ e.preventDefault(); run(); }
+    });
+  });
   runAgainBtn.addEventListener('click', function(){
     resultEl.classList.remove('show');
     resultEl.style.display = 'none';
     window.scrollTo({ top: 0, behavior: 'smooth' });
     keywordEl.focus();
+    keywordEl.select();
   });
 })();
 </script>
