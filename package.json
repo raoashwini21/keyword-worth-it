@@ -1,0 +1,11 @@
+{
+  "name": "keyword-worth-it",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test --experimental-test-module-mocks"
+  }
+}

@@ -5,268 +5,316 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Keyword Worth It?</title>
 <meta name="description" content="Paste your website and a keyword. See it rendered as the search result it would become, before you spend the hours writing it.">
+<meta name="theme-color" content="#2f5a8f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600;1,9..144,700&family=Space+Mono:wght@400;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* ────────────────────────────────────────────────────────────────────
+     The keyword forecast. The verdict is the weather and the whole sky
+     changes with it: clear for Write it, partly cloudy for Maybe, a
+     storm for Long shot, fog for Skip it. Scores read like a forecast's
+     conditions, today's top results are the "rivals" tile, and
+     everything sits on frosted-glass tiles over the sky.
+     The sky is the theme, so white-on-sky text is used in both schemes;
+     only the idle sky switches to night in dark mode.
+     ──────────────────────────────────────────────────────────────────── */
+  /* registered so the sky colours can transition between verdicts */
+  @property --sky-a{syntax:'<color>';inherits:true;initial-value:#27466f;}
+  @property --sky-b{syntax:'<color>';inherits:true;initial-value:#48709f;}
+  @property --sky-c{syntax:'<color>';inherits:true;initial-value:#86a9cf;}
   :root{
-    --paper:oklch(97% 0.008 85); --paper-raised:oklch(100% 0 0);
-    --ink:oklch(21% 0.03 280); --ink-soft:oklch(48% 0.018 280);
-    --line:oklch(90% 0.008 85); --line-strong:oklch(83% 0.012 85);
-    --link:oklch(52% 0.155 265); --link-dim:oklch(70% 0.08 265);
-    --gold:oklch(48% 0.11 152); --gold-soft:oklch(95% 0.03 150);
-    --brick:oklch(50% 0.145 25); --brick-soft:oklch(95% 0.025 25);
-    --ring: oklch(52% 0.155 265 / 0.35);
-    --shadow-xs: 0 1px 2px oklch(20% 0.03 280 / 0.05);
-    --shadow-sm: 0 1px 2px oklch(20% 0.03 280 / 0.04), 0 2px 6px oklch(20% 0.03 280 / 0.05);
+    --font:-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
+    --text:#ffffff; --text-2:rgba(255,255,255,.72); --text-3:rgba(255,255,255,.55);
+    --tile:rgba(255,255,255,.14); --tile-line:rgba(255,255,255,.18);
+    --sky-a:#27466f; --sky-b:#48709f; --sky-c:#86a9cf;
   }
   @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --paper:oklch(17% 0.014 280); --paper-raised:oklch(22% 0.016 280);
-      --ink:oklch(93% 0.008 85); --ink-soft:oklch(67% 0.016 280);
-      --line:oklch(30% 0.016 280); --line-strong:oklch(38% 0.018 280);
-      --link:oklch(75% 0.11 265); --link-dim:oklch(52% 0.09 265);
-      --gold:oklch(76% 0.12 150); --gold-soft:oklch(27% 0.035 150);
-      --brick:oklch(72% 0.13 25); --brick-soft:oklch(27% 0.04 25);
-      --ring: oklch(75% 0.11 265 / 0.4);
-      --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.25);
-      --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.2), 0 2px 8px oklch(0% 0 0 / 0.25);
-    }
+    body[data-sky="idle"]{--sky-a:#0c1426;--sky-b:#1d2c4a;--sky-c:#3a4f74;}
   }
-  :root[data-theme="dark"]{
-    --paper:oklch(17% 0.014 280); --paper-raised:oklch(22% 0.016 280);
-    --ink:oklch(93% 0.008 85); --ink-soft:oklch(67% 0.016 280);
-    --line:oklch(30% 0.016 280); --line-strong:oklch(38% 0.018 280);
-    --link:oklch(75% 0.11 265); --link-dim:oklch(52% 0.09 265);
-    --gold:oklch(76% 0.12 150); --gold-soft:oklch(27% 0.035 150);
-    --brick:oklch(72% 0.13 25); --brick-soft:oklch(27% 0.04 25);
-    --ring: oklch(75% 0.11 265 / 0.4);
-    --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.25);
-    --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.2), 0 2px 8px oklch(0% 0 0 / 0.25);
-  }
+  body[data-sky="loading"]{--sky-a:#2c4466;--sky-b:#4d6788;--sky-c:#7d93ad;}
+  body[data-sky="clear"] {--sky-a:#1666c5;--sky-b:#3f95e6;--sky-c:#86c7f3;}
+  body[data-sky="cloudy"]{--sky-a:#46698f;--sky-b:#6f8fb2;--sky-c:#a4bad2;}
+  body[data-sky="storm"] {--sky-a:#161d27;--sky-b:#2a3542;--sky-c:#445263;}
+  body[data-sky="fog"]   {--sky-a:#5f676d;--sky-b:#838b90;--sky-c:#a9b0b3;}
 
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
   body{
-    background:var(--paper); color:var(--ink);
-    font-family:'Public Sans', system-ui, sans-serif;
-    padding:56px 20px 70px;
+    min-height:100vh;color:var(--text);font-family:var(--font);font-size:15px;line-height:1.45;
+    -webkit-font-smoothing:antialiased;background:var(--sky-a);padding:0 16px;
+    transition:--sky-a 1.4s ease, --sky-b 1.4s ease, --sky-c 1.4s ease;
   }
-  .wrap{max-width:600px;margin:0 auto;}
+  ::selection{background:rgba(255,255,255,.35);}
 
-  ::selection{background:var(--link); color:var(--paper);}
+  /* ── the sky ───────────────────────────────────────────────────── */
+  .sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;
+    background:linear-gradient(180deg,var(--sky-a) 0%,var(--sky-b) 55%,var(--sky-c) 100%);}
+  .sun,.cloud,.rain,.flash,.fog{position:absolute;opacity:0;transition:opacity 1.2s ease;}
 
-  .masthead{display:flex;align-items:center;justify-content:space-between;margin-bottom:50px;border-bottom:1px solid var(--line); padding-bottom:16px;}
-  .masthead-brand{display:flex;align-items:center;gap:9px;}
-  .masthead-mark{flex:none;color:var(--gold);}
-  .masthead-name{font-family:'Fraunces',serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;}
-  .masthead-tag{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);}
+  .sun{top:-140px;right:-120px;width:460px;height:460px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,240,190,.95) 0,rgba(255,220,130,.55) 18%,rgba(255,210,120,.18) 42%,transparent 68%);}
+  body[data-sky="clear"] .sun{opacity:1;animation:glow 8s ease-in-out infinite;}
+  @keyframes glow{50%{transform:scale(1.06);}}
 
-  h1{
-    font-family:'Fraunces',serif;font-weight:600;font-size:clamp(32px,7.2vw,50px);
-    line-height:1.1;margin:0 0 18px;letter-spacing:-0.015em;max-width:15ch;
-  }
-  h1 em{font-style:italic;font-weight:700;color:var(--gold);}
-  p.lede{font-size:16.5px;line-height:1.65;color:var(--ink-soft);margin:0 0 40px;max-width:46ch;}
+  .cloud{width:340px;height:110px;border-radius:110px;background:rgba(255,255,255,.55);filter:blur(18px);}
+  .cloud.c1{top:9%;left:-360px;animation:drift 70s linear infinite;}
+  .cloud.c2{top:30%;left:-360px;width:420px;height:130px;animation:drift 95s linear infinite -40s;}
+  .cloud.c3{top:58%;left:-360px;width:280px;animation:drift 80s linear infinite -65s;opacity:0;}
+  @keyframes drift{to{transform:translateX(calc(100vw + 760px));}}
+  body[data-sky="cloudy"] .cloud,body[data-sky="loading"] .cloud{opacity:.8;}
+  body[data-sky="loading"] .cloud{animation-duration:14s;}
+  body[data-sky="storm"] .cloud{opacity:.35;background:rgba(30,38,48,.9);}
+  body[data-sky="clear"] .cloud.c2{opacity:.3;}
 
-  /* the query bar — the hero interaction, two columns: site / keyword */
-  .query-bar{
-    display:flex;align-items:stretch;
-    background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:14px;
-    margin-bottom:10px;box-shadow:var(--shadow-sm);
-  }
-  .field{display:flex;flex-direction:column;gap:6px;padding:12px 18px;flex:1;min-width:0;}
-  .field:first-child{flex:0.85;}
-  .field label{
-    font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.06em;
-    text-transform:uppercase;color:var(--ink-soft);
-  }
-  .field-divider{width:1px;background:var(--line);margin:10px 0;flex:none;}
-  .field-input{display:flex;align-items:center;gap:8px;min-width:0;}
-  .field-input svg{flex:none;color:var(--ink-soft);}
-  .field:focus-within label{color:var(--link);}
-  .query-syntax{
-    font-family:'Space Mono',monospace;font-size:14.5px;color:var(--ink-soft);white-space:nowrap;
-  }
-  .field-input input{
-    font-family:'Space Mono',monospace;font-size:14.5px;color:var(--ink);
-    background:transparent;border:none;padding:0;min-width:0;width:100%;caret-color:var(--link);
-  }
-  .field-input input:focus{outline:none;}
-  .field-input input::placeholder{color:var(--ink-soft);opacity:0.6;}
-  .field:has(input:focus){background:var(--paper);border-radius:10px;}
-  .query-bar:focus-within{border-color:var(--link); box-shadow:var(--shadow-sm), 0 0 0 3px var(--ring);}
+  .rain{inset:-20% 0 0 0;
+    background-image:
+      repeating-linear-gradient(105deg,transparent 0 18px,rgba(200,220,255,.28) 18px 19px,transparent 19px 46px),
+      repeating-linear-gradient(105deg,transparent 0 31px,rgba(200,220,255,.18) 31px 32px,transparent 32px 70px);
+    background-size:220px 180px, 300px 240px;}
+  body[data-sky="storm"] .rain{opacity:1;animation:fall .5s linear infinite;}
+  @keyframes fall{to{background-position:-40px 180px,-50px 240px;}}
+  .flash{inset:0;background:rgba(255,255,255,.9);}
+  body[data-sky="storm"] .flash{animation:lightning 9s infinite 2s;}
+  @keyframes lightning{0%,93%,100%{opacity:0;}94%{opacity:.5;}95%{opacity:0;}96.5%{opacity:.3;}97.5%{opacity:0;}}
 
-  .run-row{display:flex;justify-content:flex-end;margin-bottom:6px;}
+  .fog{left:-50%;width:200%;height:220px;border-radius:50%;background:rgba(235,238,240,.45);filter:blur(40px);}
+  .fog.f1{top:22%;animation:haze 26s ease-in-out infinite alternate;}
+  .fog.f2{top:60%;animation:haze 34s ease-in-out infinite alternate-reverse;}
+  @keyframes haze{from{transform:translateX(-12%);}to{transform:translateX(12%);}}
+  body[data-sky="fog"] .fog{opacity:1;}
+
+  /* ── app column ────────────────────────────────────────────────── */
+  .app{max-width:720px;margin:0 auto;padding:22px 0 56px;}
+
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;font-size:13px;color:var(--text-2);}
+  .top b{color:var(--text);font-weight:600;font-size:15px;}
+
+  .search{
+    display:flex;align-items:center;gap:0;min-width:0;border-radius:14px;padding:5px 5px 5px 14px;
+    background:rgba(255,255,255,.16);backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);
+    border:1px solid var(--tile-line);
+  }
+  .search:focus-within{background:rgba(255,255,255,.24);}
+  .search label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  .search svg.glass{flex:none;color:var(--text-2);margin-right:8px;}
+  .search input{min-width:0;border:none;background:transparent;color:var(--text);font:inherit;font-size:16px;padding:9px 0;}
+  .search input::placeholder{color:var(--text-3);}
+  .search input:focus{outline:none;}
+  #keyword{flex:1;}
+  .search .for{flex:none;color:var(--text-3);font-size:14px;margin:0 8px 0 14px;padding-left:14px;border-left:1px solid var(--tile-line);line-height:22px;}
+  #website{flex:0 0 150px;font-size:15px;color:var(--text-2);}
   .run-btn{
-    font-family:'Space Mono',monospace;font-size:13px;font-weight:700;
-    background:var(--ink);color:var(--paper);border:none;border-radius:10px;
-    padding:11px 20px;cursor:pointer;display:flex;align-items:center;gap:8px;
-    box-shadow:var(--shadow-xs);
-    transition:opacity .15s ease, transform .1s ease;
+    flex:none;height:38px;padding:0 16px;margin-left:6px;border:none;border-radius:10px;cursor:pointer;
+    background:rgba(255,255,255,.92);color:#1d3557;font:inherit;font-size:14px;font-weight:600;
+    display:flex;align-items:center;gap:8px;transition:transform .1s ease, background .15s ease;
   }
-  .run-btn:hover:not(:disabled){opacity:0.88;}
-  .run-btn:active:not(:disabled){transform:translateY(1px);}
-  .run-btn:focus-visible{outline:2px solid var(--link); outline-offset:2px;}
-  .run-btn:disabled{opacity:0.5;cursor:default;}
-  .spinner{width:11px;height:11px;border-radius:50%;border:2px solid oklch(100% 0 0 / 0.35);border-top-color:var(--paper);animation:spin 0.7s linear infinite;display:none;}
+  .run-btn:hover:not(:disabled){background:#fff;}
+  .run-btn:active:not(:disabled){transform:scale(.97);}
+  .run-btn:focus-visible{outline:2px solid #fff;outline-offset:3px;}
+  .run-btn:disabled{opacity:.7;cursor:default;}
+  .spinner{display:none;width:13px;height:13px;border-radius:50%;border:2px solid rgba(29,53,87,.3);border-top-color:#1d3557;animation:spin .7s linear infinite;}
   .run-btn.loading .spinner{display:inline-block;}
   @keyframes spin{to{transform:rotate(360deg);}}
-  .status-line{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);text-align:right;margin-bottom:10px;display:none;}
+
+  .status-line{display:none;margin:14px 2px 0;color:var(--text-2);font-size:14px;}
   .status-line.show{display:block;}
+  .status-line .dots::after{content:"…";}
+  .error-box{display:none;margin:14px 0 0;padding:12px 14px;border-radius:12px;background:rgba(120,20,20,.35);border:1px solid rgba(255,160,160,.35);font-size:14px;}
 
-  .error-box{
-    background:var(--brick-soft);color:var(--brick);
-    padding:13px 16px;border-radius:10px;font-size:13.5px;line-height:1.6;margin-top:18px;display:none;
+  /* ── hero: idle copy, then the "now" block ─────────────────────── */
+  .idle{text-align:center;padding:12vh 8px 4vh;}
+  body:not([data-sky="idle"]) .idle{display:none;}
+  .idle .icon{margin:0 auto 18px;opacity:.9;}
+  .idle h1{margin:0 auto 14px;max-width:18ch;font-size:clamp(30px,6.4vw,46px);line-height:1.1;font-weight:300;letter-spacing:-.02em;text-shadow:0 1px 12px rgba(0,0,0,.12);}
+  .idle h1 em{font-style:normal;font-weight:500;}
+  .idle .lede{margin:0 auto;max-width:42ch;color:var(--text-2);font-size:16px;}
+  .legend{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:26px;}
+  .legend span{padding:6px 12px;border-radius:999px;background:var(--tile);border:1px solid var(--tile-line);font-size:13px;color:var(--text-2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+
+  #result{display:none;}
+  #result.show{display:block;}
+
+  .call-strip{text-align:center;padding:7vh 8px 30px;}
+  .place{font-size:30px;font-weight:400;letter-spacing:-.01em;margin:0;text-shadow:0 1px 10px rgba(0,0,0,.12);}
+  .query{margin:2px 0 0;color:var(--text-2);font-size:15px;}
+  .wx{display:flex;align-items:center;justify-content:center;gap:14px;margin:18px 0 4px;}
+  .wx svg{display:none;flex:none;filter:drop-shadow(0 2px 10px rgba(0,0,0,.12));}
+  .call-strip[data-verdict="Write it."] .wx .i-clear,
+  .call-strip[data-verdict="Maybe."] .wx .i-cloudy,
+  .call-strip[data-verdict="Long shot."] .wx .i-storm,
+  .call-strip[data-verdict="Skip it."] .wx .i-fog{display:block;}
+  .stamp{font-size:clamp(46px,11vw,88px);line-height:1;font-weight:200;letter-spacing:-.04em;text-shadow:0 2px 18px rgba(0,0,0,.12);}
+  .call-strip p{margin:10px auto 0;max-width:40ch;font-size:17px;font-weight:500;}
+  #result.show .call-strip > *{animation:rise .7s cubic-bezier(.2,.8,.2,1) both;}
+  #result.show .call-strip > :nth-child(3){animation-delay:.08s;}
+  #result.show .call-strip > :nth-child(4){animation-delay:.16s;}
+  #result.show .call-strip > :nth-child(5){animation-delay:.24s;}
+  @keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+  /* ── tiles ─────────────────────────────────────────────────────── */
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .tile{
+    grid-column:span 2;border-radius:18px;padding:12px 16px 16px;background:var(--tile);border:1px solid var(--tile-line);
+    backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);
   }
+  .tile.half{grid-column:span 1;}
+  #result.show .tile{animation:rise .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.3s + var(--d,0) * 70ms);}
+  .tile-head{display:flex;align-items:center;gap:6px;margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--tile-line);
+    font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3);}
+  .tile-head svg{flex:none;}
 
-  /* result rendered as a fake search snippet */
-  #result{display:none;margin-top:44px;}
-  #result.show{display:block;animation:reveal 0.4s cubic-bezier(0.16, 1, 0.3, 1);}
-  @keyframes reveal{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  /* conditions — the scores, set like a 10-day forecast */
+  .gauge{display:grid;grid-template-columns:120px 48px 1fr;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--tile-line);}
+  .gauge:last-child{border-bottom:none;padding-bottom:2px;}
+  .gauge-label{font-size:16px;font-weight:500;}
+  .gauge b{font-size:16px;font-weight:500;text-align:right;font-variant-numeric:tabular-nums;}
+  .gauge-track{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,#ff6b6b,#ffd166 50%,#5fd68a);}
+  .gauge.inverse .gauge-track{background:linear-gradient(90deg,#5fd68a,#ffd166 50%,#ff6b6b);}
+  .gauge-fill{position:relative;height:100%;width:0;transition:width 1.1s cubic-bezier(.2,.8,.2,1) .5s;}
+  .gauge-fill::after{content:"";position:absolute;right:-6px;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(0,0,0,.18);}
 
-  .result-eyebrow{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);margin-bottom:18px;}
+  /* the would-be result */
+  .snippet{background:rgba(255,255,255,.95);color:#202124;border-radius:12px;padding:14px 16px;font-family:Arial,Helvetica,sans-serif;}
+  .snippet-breadcrumb{display:flex;align-items:center;gap:10px;font-size:13.5px;color:#202124;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .favicon{flex:none;width:26px;height:26px;border-radius:50%;background:#f1f3f4;border:1px solid #dadce0;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#5f6368;text-transform:uppercase;}
+  .snippet-title{margin:0 0 4px;font-size:19px;line-height:1.3;color:#1a0dab;}
+  .snippet-desc{margin:0;font-size:14px;line-height:1.55;color:#4d5156;}
 
-  .snippet{border-top:1px solid var(--line);padding-top:20px;}
-  .snippet-breadcrumb{font-size:13px;color:var(--ink-soft);margin-bottom:4px;}
-  .snippet-title{
-    font-family:'Fraunces',serif;font-weight:600;font-size:21px;line-height:1.32;
-    color:var(--link);margin:0 0 8px;
-  }
-  .snippet-desc{font-size:15px;line-height:1.6;margin:0 0 14px;max-width:56ch;}
-  .snippet-meta{
-    font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);
-    display:flex;flex-wrap:wrap;gap:14px;
-  }
-  .snippet-meta b{color:var(--ink);font-weight:700;}
+  /* rivals */
+  .rivals{list-style:none;margin:0;padding:0;counter-reset:r;}
+  .rivals li{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:15px;min-width:0;}
+  .rivals li::before{counter-increment:r;content:counter(r);flex:none;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.18);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+  .rivals li span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rivals .none{color:var(--text-2);font-size:14px;}
+  .rivals .none::before{display:none;}
+  .serp-note{margin:10px 0 0;font-size:12.5px;color:var(--text-3);}
+  .serp-note b{color:var(--text-2);font-weight:500;}
 
-  .serp-note{font-size:12.5px;color:var(--ink-soft);margin:10px 0 0;line-height:1.6;}
-  .serp-note b{color:var(--ink);font-weight:600;}
-  .serp-note.estimate{font-style:italic;}
-
-  .reasoning{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:none;}
+  /* why */
+  .reasoning{display:none;}
   .reasoning.show{display:block;}
-  .reasoning .why-row{display:flex;gap:8px;font-size:13px;line-height:1.55;margin-bottom:8px;}
-  .reasoning .why-row:last-child{margin-bottom:0;}
-  .reasoning .why-label{
-    font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.04em;
-    text-transform:uppercase;color:var(--ink-soft);flex:none;width:88px;padding-top:2px;
-  }
-  .reasoning .why-text{color:var(--ink-soft);}
-
-  /* the verdict, staged as an ink stamp — the one decisive moment on the page */
-  .call-strip{
-    margin-top:32px;padding:26px 4px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
-    display:flex;align-items:center;gap:22px;flex-wrap:wrap;
-  }
-  .stamp{
-    flex:none;position:relative;
-    font-family:'Fraunces',serif;font-style:italic;font-weight:700;
-    font-size:25px;letter-spacing:0.01em;line-height:1;
-    padding:11px 20px;border:2.5px solid var(--gold);border-radius:4px;
-    color:var(--gold);transform:rotate(-3deg);
-    text-shadow:0 0 0.5px currentColor;
-  }
-  .stamp::after{
-    content:"";position:absolute;inset:3px;border:1px solid currentColor;border-radius:2px;opacity:0.35;
-    pointer-events:none;
-  }
-  .call-strip.negative .stamp{border-color:var(--brick);color:var(--brick);}
-  .call-strip p{margin:0;font-size:14.5px;line-height:1.6;color:var(--ink-soft);flex:1;min-width:200px;}
+  .reasoning .why-row{padding:6px 0 8px;}
+  .reasoning .why-row + .why-row{border-top:1px solid var(--tile-line);padding-top:10px;}
+  .reasoning .why-label{display:block;font-size:12px;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+  .reasoning .why-text{font-size:14.5px;}
+  /* no reasoning from Jev: hide the "why" tile and let rivals take the row */
+  .tile.why:not(:has(.reasoning.show)){display:none;}
+  .tiles:not(:has(.reasoning.show)) .rivals-tile{grid-column:span 2;}
 
   .again{
-    display:inline-block;margin-top:24px;font-family:'Space Mono',monospace;font-size:12.5px;
-    color:var(--ink-soft);background:none;border:none;cursor:pointer;text-decoration:underline;
-    text-underline-offset:3px;padding:0;transition:color .15s ease;
+    display:block;margin:22px auto 0;padding:11px 20px;border-radius:999px;border:1px solid var(--tile-line);
+    background:var(--tile);color:var(--text);font:inherit;font-size:14px;font-weight:500;cursor:pointer;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   }
-  .again:hover{color:var(--ink);}
-  .again:focus-visible{outline:2px solid var(--link); outline-offset:3px;}
+  .again:hover{background:rgba(255,255,255,.24);}
+  .again:focus-visible{outline:2px solid #fff;outline-offset:3px;}
 
-  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-soft);line-height:1.7;}
-  footer a{color:var(--link);font-weight:600;text-decoration:none;}
-  footer a:hover{text-decoration:underline; text-underline-offset:3px;}
+  footer{max-width:720px;margin:0 auto;padding:0 0 34px;text-align:center;font-size:13px;color:var(--text-3);}
+  footer a{color:var(--text-2);}
 
-  @media (max-width:480px){
-    .query-bar{flex-direction:column;}
-    .field-divider{width:auto;height:1px;margin:0 18px;}
-    .field, .field:first-child{flex:none;}
+  @media (max-width:600px){
+    .search{flex-wrap:wrap;padding:4px 5px 5px 12px;}
+    #keyword{flex:1 1 calc(100% - 30px);}
+    .search .for{order:3;margin:0 8px 0 0;padding:0;border-left:none;}
+    #website{order:4;flex:1;}
+    .run-btn{order:5;}
+    .search::after{content:"";order:2;flex:1 1 100%;height:1px;background:var(--tile-line);margin:2px 0 4px -12px;}
+    .tile.half{grid-column:span 2;}
+    .gauge{grid-template-columns:112px 42px 1fr;gap:10px;}
+    .gauge-label{font-size:15px;white-space:nowrap;}
+    .place{font-size:26px;}
+    .top span:last-child{display:none;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.01ms !important;animation-delay:0ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;transition-delay:0ms !important;}
   }
 </style>
 </head>
-<body>
-<div class="wrap">
+<body data-sky="idle">
 
-  <div class="masthead">
-    <div class="masthead-brand">
-      <svg class="masthead-mark" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-        <path d="M3 6c0-2 1.6-3.5 3.5-3.5S10 4 10 6s-1.6 3.5-3.5 3.5S3 11 3 13s1.6 3.5 3.5 3.5S10 15 10 13s1.6-3.5 3.5-3.5S17 11 17 13s-1.6 3.5-3.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="14.6" cy="4.8" r="1.15" fill="currentColor"/>
-      </svg>
-      <div class="masthead-name">Keyword Worth It?</div>
-    </div>
-    <div class="masthead-tag">from the SERPent team</div>
-  </div>
+<div class="sky" aria-hidden="true">
+  <div class="sun"></div>
+  <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+  <div class="fog f1"></div><div class="fog f2"></div>
+  <div class="rain"></div>
+  <div class="flash"></div>
+</div>
 
-  <h1>Would this <em>actually</em> rank, or is it a waste of an afternoon?</h1>
-  <p class="lede">Run the keyword like a query. You'll get back the result it would actually become — before you spend the hours writing it.</p>
+<div class="app">
+  <div class="top"><b>Keyword Worth It?</b><span>the keyword forecast · from the SERPent team</span></div>
 
-  <div class="query-bar">
-    <div class="field">
-      <label for="website">site</label>
-      <div class="field-input">
-        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.2" cy="6.2" r="5.2" stroke="currentColor" stroke-width="1.5"/><line x1="9.9" y1="9.9" x2="13.5" y2="13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        <input type="text" id="website" placeholder="salesrobot.co" value="salesrobot.co">
-      </div>
-    </div>
-    <div class="field-divider" aria-hidden="true"></div>
-    <div class="field">
-      <label for="keyword">keyword</label>
-      <div class="field-input">
-        <span class="query-syntax">&ldquo;</span>
-        <input type="text" id="keyword" placeholder="best cold email software" value="best cold email software">
-        <span class="query-syntax">&rdquo;</span>
-      </div>
-    </div>
-  </div>
+  <form class="search" id="queryForm" onsubmit="return false;" role="search">
+    <svg class="glass" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5 20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <label for="keyword">keyword</label>
+    <input type="text" id="keyword" placeholder="best cold email software" value="best cold email software" autocomplete="off" spellcheck="false">
+    <span class="for">for</span>
+    <label for="website">site</label>
+    <input type="text" id="website" placeholder="salesrobot.co" value="salesrobot.co" autocomplete="url" spellcheck="false" autocapitalize="off">
+    <button class="run-btn" id="runBtn" type="button"><span class="spinner"></span><span id="runBtnLabel">run the query</span></button>
+  </form>
 
-  <div class="run-row">
-    <button class="run-btn" id="runBtn" type="button">
-      <span class="spinner"></span>
-      <span id="runBtnLabel">run the query</span>
-    </button>
-  </div>
-  <div class="status-line" id="statusLine">reading the site...</div>
+  <div class="status-line" id="statusLine" role="status" aria-live="polite"><span id="statusText">reading the site</span><span class="dots"></span></div>
+  <div class="error-box" id="errorBox" role="alert"></div>
 
-  <div class="error-box" id="errorBox"></div>
+  <section class="idle">
+    <svg class="icon" width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="10" fill="#FFD76A"/><path d="M24 6v4M24 38v4M6 24h4M38 24h4M11.3 11.3l2.8 2.8M33.9 33.9l2.8 2.8M11.3 36.7l2.8-2.8M33.9 14.1l2.8-2.8" stroke="#FFD76A" stroke-width="2.5" stroke-linecap="round"/><path d="M22 52h26a10 10 0 0 0 0-20 13 13 0 0 0-25 3.5A8.3 8.3 0 0 0 22 52Z" fill="#fff" fill-opacity=".95"/></svg>
+    <h1>Would this <em>actually</em> rank, or is it a waste of an afternoon?</h1>
+    <p class="lede">Run the keyword like a query. You'll get back the result it would actually become — before you spend the hours writing it.</p>
+    <div class="legend"><span>☀ Write it</span><span>⛅ Maybe</span><span>⛈ Long shot</span><span>🌫 Skip it</span></div>
+  </section>
 
-  <div id="result">
-    <div class="result-eyebrow">here's what that post would look like</div>
-    <div class="snippet">
-      <div class="snippet-breadcrumb" id="snippetBreadcrumb"></div>
-      <p class="snippet-title" id="snippetTitle"></p>
-      <p class="snippet-desc" id="snippetDesc"></p>
-      <div class="snippet-meta">
-        <span>intent <b id="scoreIntent">-</b></span>
-        <span>buying stage <b id="scoreBuying">-</b></span>
-        <span>competition <b id="scoreCompetitive">-</b></span>
-      </div>
-      <p class="serp-note" id="serpNote"></p>
-      <div class="reasoning" id="reasoning"></div>
-    </div>
-
+  <section id="result" aria-live="polite">
     <div class="call-strip" id="callStrip">
+      <p class="place" id="nowPlace"></p>
+      <p class="query" id="nowQuery"></p>
+      <div class="wx">
+        <svg class="i-clear" width="56" height="56" viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="12" fill="#FFD76A"/><path d="M32 8v6M32 50v6M8 32h6M50 32h6M15 15l4.2 4.2M44.8 44.8 49 49M15 49l4.2-4.2M44.8 19.2 49 15" stroke="#FFD76A" stroke-width="3" stroke-linecap="round"/></svg>
+        <svg class="i-cloudy" width="60" height="56" viewBox="0 0 64 60" fill="none" aria-hidden="true"><circle cx="22" cy="20" r="10" fill="#FFD76A"/><path d="M20 50h28a11 11 0 0 0 0-22 14 14 0 0 0-27 4 9 9 0 0 0-1 18Z" fill="#fff"/></svg>
+        <svg class="i-storm" width="60" height="60" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M18 38h30a11 11 0 0 0 0-22 14 14 0 0 0-27 4 9 9 0 0 0-3 18Z" fill="#dfe6ee"/><path d="m34 36-7 12h7l-4 11 12-15h-8l5-8" fill="#FFD76A"/><path d="M20 44l-3 7M47 44l-3 7" stroke="#9cc3ff" stroke-width="3" stroke-linecap="round"/></svg>
+        <svg class="i-fog" width="60" height="56" viewBox="0 0 64 60" fill="none" aria-hidden="true"><path d="M8 22h40M14 32h44M6 42h38M16 52h34" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-opacity=".9"/></svg>
+      </div>
       <div class="stamp"><span id="callWord"></span></div>
       <p id="callRest"></p>
     </div>
 
+    <div class="tiles">
+      <div class="tile" style="--d:0">
+        <div class="tile-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>conditions</div>
+        <div class="gauge"><span class="gauge-label">Intent</span><b id="scoreIntent">-</b><div class="gauge-track"><div class="gauge-fill" id="barIntent"></div></div></div>
+        <div class="gauge"><span class="gauge-label">Buying stage</span><b id="scoreBuying">-</b><div class="gauge-track"><div class="gauge-fill" id="barBuying"></div></div></div>
+        <div class="gauge inverse"><span class="gauge-label">Competition</span><b id="scoreCompetitive">-</b><div class="gauge-track"><div class="gauge-fill" id="barCompetitive"></div></div></div>
+      </div>
+
+      <div class="tile" style="--d:1">
+        <div class="tile-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="2"/><path d="M7 9h10M7 13h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>here's what that post would look like</div>
+        <article class="snippet">
+          <div class="snippet-breadcrumb"><span class="favicon" id="snippetFavicon" aria-hidden="true"></span><span id="snippetBreadcrumb"></span></div>
+          <p class="snippet-title" id="snippetTitle"></p>
+          <p class="snippet-desc" id="snippetDesc"></p>
+        </article>
+      </div>
+
+      <div class="tile half rivals-tile" style="--d:2">
+        <div class="tile-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>today's rivals</div>
+        <ol class="rivals" id="rivalList"></ol>
+        <p class="serp-note" id="serpNote"></p>
+      </div>
+
+      <div class="tile half why" style="--d:3">
+        <div class="tile-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>why</div>
+        <div class="reasoning" id="reasoning"></div>
+      </div>
+    </div>
+
     <button class="again" id="runAgainBtn" type="button">run another keyword</button>
-  </div>
-
-  <footer>
-    From <a href="https://serpent.up.railway.app" target="_blank" rel="noopener">SERPent</a>, the keyword-to-blog pipeline — this is the sniff test that comes before it writes anything.
-  </footer>
-
+  </section>
 </div>
+
+<footer>
+  From <a href="https://serpent.up.railway.app" target="_blank" rel="noopener">SERPent</a>, the keyword-to-blog pipeline — this is the sniff test that comes before it writes anything.
+</footer>
 
 <script>
 (function(){
@@ -278,14 +326,19 @@
   const runBtn = $('runBtn');
   const runBtnLabel = $('runBtnLabel');
   const statusLine = $('statusLine');
+  const statusText = $('statusText');
   const errorBox = $('errorBox');
   const resultEl = $('result');
   const snippetBreadcrumb = $('snippetBreadcrumb');
+  const snippetFavicon = $('snippetFavicon');
   const snippetTitle = $('snippetTitle');
   const snippetDesc = $('snippetDesc');
   const scoreIntent = $('scoreIntent');
   const scoreBuying = $('scoreBuying');
   const scoreCompetitive = $('scoreCompetitive');
+  const barIntent = $('barIntent');
+  const barBuying = $('barBuying');
+  const barCompetitive = $('barCompetitive');
   const serpNote = $('serpNote');
   const reasoningEl = $('reasoning');
   const callStrip = $('callStrip');
@@ -293,7 +346,41 @@
   const callRest = $('callRest');
   const runAgainBtn = $('runAgainBtn');
 
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Scores count up to their value. Presentational only.
+  function countUp(el, finalText, duration){
+    const target = parseInt(finalText, 10);
+    if (reduceMotion || isNaN(target)){ el.textContent = finalText; return; }
+    const start = performance.now();
+    (function frame(now){
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(target * eased) + '%';
+      if (t < 1) requestAnimationFrame(frame); else el.textContent = finalText;
+    })(start);
+  }
+
+  // The request runs three steps server-side (site → today's top ten → verdict);
+  // the status line walks through them so the wait reads as work, not a hang.
+  const STATUS_STEPS = ['reading the site', "checking today's top ten", 'weighing the verdict'];
+  let statusTimer = null;
+  function startStatus(){
+    let i = 0;
+    statusText.textContent = STATUS_STEPS[0];
+    statusLine.classList.add('show');
+    clearInterval(statusTimer);
+    statusTimer = setInterval(function(){
+      if (i < STATUS_STEPS.length - 1){ i++; statusText.textContent = STATUS_STEPS[i]; }
+    }, 2600);
+  }
+  function stopStatus(){
+    clearInterval(statusTimer);
+    statusLine.classList.remove('show');
+  }
+
   function showError(msg){
+    setSky('idle');
     errorBox.textContent = msg;
     errorBox.style.display = 'block';
   }
@@ -336,7 +423,55 @@
     return website.replace(/^https?:\/\//i, '').replace(/\/$/, '');
   }
 
+  // Gauge bars: purely presentational. For intent and buying stage, higher is
+  // better; for competition, higher is worse — the colour follows that.
+  function setGauge(bar, value, higherIsBetter){
+    const good = higherIsBetter ? value >= 0.6 : value < 0.5;
+    const bad = higherIsBetter ? value < 0.45 : value >= 0.65;
+    bar.className = 'gauge-fill ' + (good ? 'good' : bad ? 'bad' : 'mid');
+    bar.style.width = '0';
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){ bar.style.width = Math.max(2, Math.round(value * 100)) + '%'; });
+    });
+  }
+
+  // ── The forecast ─────────────────────────────────────────────────
+  // The verdict sets the sky (clear / cloudy / storm / fog) and the
+  // "today's rivals" tile lists the real top results from the backend.
+  const nowPlace = $('nowPlace');
+  const nowQuery = $('nowQuery');
+  const rivalList = $('rivalList');
+  const SKY = { 'Write it.': 'clear', 'Maybe.': 'cloudy', 'Long shot.': 'storm', 'Skip it.': 'fog' };
+  let lastTopResults = [];
+
+  function setSky(name){ document.body.dataset.sky = name; }
+
+  function setForecast(word, keyword, domain, grounded){
+    setSky(SKY[word] || 'idle');
+    callStrip.dataset.verdict = word;
+    nowPlace.textContent = domain;
+    nowQuery.textContent = '“' + keyword + '”';
+
+    rivalList.textContent = '';
+    const results = grounded ? lastTopResults.filter(function(r){ return r && r.domain; }).slice(0, 6) : [];
+    if (!results.length){
+      const li = document.createElement('li');
+      li.className = 'none';
+      li.textContent = 'Live results unavailable right now.';
+      rivalList.append(li);
+      return;
+    }
+    results.forEach(function(r){
+      const li = document.createElement('li');
+      const span = document.createElement('span');
+      span.textContent = r.domain;
+      li.append(span);
+      rivalList.append(li);
+    });
+  }
+
   async function run(){
+    if (runBtn.disabled) return;
     hideError();
     resultEl.classList.remove('show');
     resultEl.style.display = 'none';
@@ -349,7 +484,8 @@
     runBtn.disabled = true;
     runBtn.classList.add('loading');
     runBtnLabel.textContent = 'running...';
-    statusLine.classList.add('show');
+    startStatus();
+    setSky('loading');
 
     try{
       const res = await fetch(RELAY_URL, {
@@ -364,13 +500,16 @@
       runBtn.disabled = false;
       runBtn.classList.remove('loading');
       runBtnLabel.textContent = 'run the query';
-      statusLine.classList.remove('show');
+      stopStatus();
 
       if (!res.ok){
         showError(data.error || ('Something went wrong (' + res.status + '). Try again.'));
         return;
       }
 
+      lastTopResults = Array.isArray(data.serpTopResults)
+        ? data.serpTopResults
+        : (data.serpTopDomains || []).map(function(d){ return { domain: d, title: '' }; });
       const container = data.answers || data.questions || data.results || data;
       const hasIntent = extractProb(container.has_real_intent);
       const tooCompetitive = extractProb(container.too_competitive);
@@ -392,7 +531,7 @@
       runBtn.disabled = false;
       runBtn.classList.remove('loading');
       runBtnLabel.textContent = 'run the query';
-      statusLine.classList.remove('show');
+      stopStatus();
       showError('Could not reach the checker. Try again in a moment.');
     }
   }
@@ -401,6 +540,9 @@
     scoreIntent.textContent = Math.round(hasIntent * 100) + '%';
     scoreBuying.textContent = Math.round(buyingStage * 100) + '%';
     scoreCompetitive.textContent = Math.round(tooCompetitive * 100) + '%';
+    setGauge(barIntent, hasIntent, true);
+    setGauge(barBuying, buyingStage, true);
+    setGauge(barCompetitive, tooCompetitive, false);
 
     reasons = reasons || {};
     const rows = [
@@ -420,7 +562,7 @@
 
     if (serpGrounded && serpTopDomains.length){
       serpNote.className = 'serp-note';
-      serpNote.innerHTML = 'Competition checked against today\'s top results — including <b>' + serpTopDomains.slice(0, 3).join('</b>, <b>') + '</b>.';
+      serpNote.innerHTML = '<span>Competition checked against today\'s top results — including <b>' + serpTopDomains.slice(0, 3).map(escapeHtml).join('</b>, <b>') + '</b>.</span>';
     } else {
       serpNote.className = 'serp-note estimate';
       serpNote.textContent = 'Competition is an estimate — not checked against live search results.';
@@ -429,6 +571,7 @@
     const domain = domainFor(website);
     const slug = slugFor(keyword);
     snippetBreadcrumb.textContent = domain + ' › blog › ' + slug;
+    snippetFavicon.textContent = (domain.replace(/^www\./i, '').charAt(0) || '·');
 
     let verdictCls, word, rest, title, desc;
 
@@ -467,20 +610,30 @@
     snippetTitle.textContent = title;
     snippetDesc.textContent = desc;
     callStrip.className = 'call-strip' + (verdictCls ? ' ' + verdictCls : '');
+    callStrip.dataset.verdict = word;
     callWord.textContent = word;
     callRest.textContent = rest;
 
     resultEl.classList.add('show');
     resultEl.style.display = 'block';
+    setForecast(word, keyword, domain, serpGrounded);
+    [scoreIntent, scoreBuying, scoreCompetitive].forEach(function(el){ countUp(el, el.textContent, 1100); });
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   runBtn.addEventListener('click', run);
+  [websiteEl, keywordEl].forEach(function(el){
+    el.addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){ e.preventDefault(); run(); }
+    });
+  });
   runAgainBtn.addEventListener('click', function(){
     resultEl.classList.remove('show');
     resultEl.style.display = 'none';
+    setSky('idle');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     keywordEl.focus();
+    keywordEl.select();
   });
 })();
 </script>

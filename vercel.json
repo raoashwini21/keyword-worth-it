@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/keyword-check.js": {
+      "maxDuration": 60
+    }
+  }
+}
