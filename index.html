@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keyword Worth It?</title>
+<meta name="description" content="Paste your website and a keyword. See it rendered as the search result it would become, before you spend the hours writing it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600;1,9..144,700&family=Space+Mono:wght@400;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:oklch(97% 0.008 85); --paper-raised:oklch(100% 0 0);
+    --ink:oklch(21% 0.03 280); --ink-soft:oklch(48% 0.018 280);
+    --line:oklch(90% 0.008 85); --line-strong:oklch(83% 0.012 85);
+    --link:oklch(52% 0.155 265); --link-dim:oklch(70% 0.08 265);
+    --gold:oklch(48% 0.11 152); --gold-soft:oklch(95% 0.03 150);
+    --brick:oklch(50% 0.145 25); --brick-soft:oklch(95% 0.025 25);
+    --ring: oklch(52% 0.155 265 / 0.35);
+    --shadow-xs: 0 1px 2px oklch(20% 0.03 280 / 0.05);
+    --shadow-sm: 0 1px 2px oklch(20% 0.03 280 / 0.04), 0 2px 6px oklch(20% 0.03 280 / 0.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:oklch(17% 0.014 280); --paper-raised:oklch(22% 0.016 280);
+      --ink:oklch(93% 0.008 85); --ink-soft:oklch(67% 0.016 280);
+      --line:oklch(30% 0.016 280); --line-strong:oklch(38% 0.018 280);
+      --link:oklch(75% 0.11 265); --link-dim:oklch(52% 0.09 265);
+      --gold:oklch(76% 0.12 150); --gold-soft:oklch(27% 0.035 150);
+      --brick:oklch(72% 0.13 25); --brick-soft:oklch(27% 0.04 25);
+      --ring: oklch(75% 0.11 265 / 0.4);
+      --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.25);
+      --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.2), 0 2px 8px oklch(0% 0 0 / 0.25);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:oklch(17% 0.014 280); --paper-raised:oklch(22% 0.016 280);
+    --ink:oklch(93% 0.008 85); --ink-soft:oklch(67% 0.016 280);
+    --line:oklch(30% 0.016 280); --line-strong:oklch(38% 0.018 280);
+    --link:oklch(75% 0.11 265); --link-dim:oklch(52% 0.09 265);
+    --gold:oklch(76% 0.12 150); --gold-soft:oklch(27% 0.035 150);
+    --brick:oklch(72% 0.13 25); --brick-soft:oklch(27% 0.04 25);
+    --ring: oklch(75% 0.11 265 / 0.4);
+    --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.25);
+    --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.2), 0 2px 8px oklch(0% 0 0 / 0.25);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:'Public Sans', system-ui, sans-serif;
+    padding:56px 20px 70px;
+  }
+  .wrap{max-width:600px;margin:0 auto;}
+
+  ::selection{background:var(--link); color:var(--paper);}
+
+  .masthead{display:flex;align-items:center;justify-content:space-between;margin-bottom:50px;border-bottom:1px solid var(--line); padding-bottom:16px;}
+  .masthead-brand{display:flex;align-items:center;gap:9px;}
+  .masthead-mark{flex:none;color:var(--gold);}
+  .masthead-name{font-family:'Fraunces',serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;}
+  .masthead-tag{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);}
+
+  h1{
+    font-family:'Fraunces',serif;font-weight:600;font-size:clamp(32px,7.2vw,50px);
+    line-height:1.1;margin:0 0 18px;letter-spacing:-0.015em;max-width:15ch;
+  }
+  h1 em{font-style:italic;font-weight:700;color:var(--gold);}
+  p.lede{font-size:16.5px;line-height:1.65;color:var(--ink-soft);margin:0 0 40px;max-width:46ch;}
+
+  /* the query bar — the hero interaction, two columns: site / keyword */
+  .query-bar{
+    display:flex;align-items:stretch;
+    background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:14px;
+    margin-bottom:10px;box-shadow:var(--shadow-sm);
+  }
+  .field{display:flex;flex-direction:column;gap:6px;padding:12px 18px;flex:1;min-width:0;}
+  .field:first-child{flex:0.85;}
+  .field label{
+    font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.06em;
+    text-transform:uppercase;color:var(--ink-soft);
+  }
+  .field-divider{width:1px;background:var(--line);margin:10px 0;flex:none;}
+  .field-input{display:flex;align-items:center;gap:8px;min-width:0;}
+  .field-input svg{flex:none;color:var(--ink-soft);}
+  .field:focus-within label{color:var(--link);}
+  .query-syntax{
+    font-family:'Space Mono',monospace;font-size:14.5px;color:var(--ink-soft);white-space:nowrap;
+  }
+  .field-input input{
+    font-family:'Space Mono',monospace;font-size:14.5px;color:var(--ink);
+    background:transparent;border:none;padding:0;min-width:0;width:100%;caret-color:var(--link);
+  }
+  .field-input input:focus{outline:none;}
+  .field-input input::placeholder{color:var(--ink-soft);opacity:0.6;}
+  .field:has(input:focus){background:var(--paper);border-radius:10px;}
+  .query-bar:focus-within{border-color:var(--link); box-shadow:var(--shadow-sm), 0 0 0 3px var(--ring);}
+
+  .run-row{display:flex;justify-content:flex-end;margin-bottom:6px;}
+  .run-btn{
+    font-family:'Space Mono',monospace;font-size:13px;font-weight:700;
+    background:var(--ink);color:var(--paper);border:none;border-radius:10px;
+    padding:11px 20px;cursor:pointer;display:flex;align-items:center;gap:8px;
+    box-shadow:var(--shadow-xs);
+    transition:opacity .15s ease, transform .1s ease;
+  }
+  .run-btn:hover:not(:disabled){opacity:0.88;}
+  .run-btn:active:not(:disabled){transform:translateY(1px);}
+  .run-btn:focus-visible{outline:2px solid var(--link); outline-offset:2px;}
+  .run-btn:disabled{opacity:0.5;cursor:default;}
+  .spinner{width:11px;height:11px;border-radius:50%;border:2px solid oklch(100% 0 0 / 0.35);border-top-color:var(--paper);animation:spin 0.7s linear infinite;display:none;}
+  .run-btn.loading .spinner{display:inline-block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .status-line{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);text-align:right;margin-bottom:10px;display:none;}
+  .status-line.show{display:block;}
+
+  .error-box{
+    background:var(--brick-soft);color:var(--brick);
+    padding:13px 16px;border-radius:10px;font-size:13.5px;line-height:1.6;margin-top:18px;display:none;
+  }
+
+  /* result rendered as a fake search snippet */
+  #result{display:none;margin-top:44px;}
+  #result.show{display:block;animation:reveal 0.4s cubic-bezier(0.16, 1, 0.3, 1);}
+  @keyframes reveal{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .result-eyebrow{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);margin-bottom:18px;}
+
+  .snippet{border-top:1px solid var(--line);padding-top:20px;}
+  .snippet-breadcrumb{font-size:13px;color:var(--ink-soft);margin-bottom:4px;}
+  .snippet-title{
+    font-family:'Fraunces',serif;font-weight:600;font-size:21px;line-height:1.32;
+    color:var(--link);margin:0 0 8px;
+  }
+  .snippet-desc{font-size:15px;line-height:1.6;margin:0 0 14px;max-width:56ch;}
+  .snippet-meta{
+    font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);
+    display:flex;flex-wrap:wrap;gap:14px;
+  }
+  .snippet-meta b{color:var(--ink);font-weight:700;}
+
+  .serp-note{font-size:12.5px;color:var(--ink-soft);margin:10px 0 0;line-height:1.6;}
+  .serp-note b{color:var(--ink);font-weight:600;}
+  .serp-note.estimate{font-style:italic;}
+
+  .reasoning{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:none;}
+  .reasoning.show{display:block;}
+  .reasoning .why-row{display:flex;gap:8px;font-size:13px;line-height:1.55;margin-bottom:8px;}
+  .reasoning .why-row:last-child{margin-bottom:0;}
+  .reasoning .why-label{
+    font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.04em;
+    text-transform:uppercase;color:var(--ink-soft);flex:none;width:88px;padding-top:2px;
+  }
+  .reasoning .why-text{color:var(--ink-soft);}
+
+  /* the verdict, staged as an ink stamp — the one decisive moment on the page */
+  .call-strip{
+    margin-top:32px;padding:26px 4px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+  }
+  .stamp{
+    flex:none;position:relative;
+    font-family:'Fraunces',serif;font-style:italic;font-weight:700;
+    font-size:25px;letter-spacing:0.01em;line-height:1;
+    padding:11px 20px;border:2.5px solid var(--gold);border-radius:4px;
+    color:var(--gold);transform:rotate(-3deg);
+    text-shadow:0 0 0.5px currentColor;
+  }
+  .stamp::after{
+    content:"";position:absolute;inset:3px;border:1px solid currentColor;border-radius:2px;opacity:0.35;
+    pointer-events:none;
+  }
+  .call-strip.negative .stamp{border-color:var(--brick);color:var(--brick);}
+  .call-strip p{margin:0;font-size:14.5px;line-height:1.6;color:var(--ink-soft);flex:1;min-width:200px;}
+
+  .again{
+    display:inline-block;margin-top:24px;font-family:'Space Mono',monospace;font-size:12.5px;
+    color:var(--ink-soft);background:none;border:none;cursor:pointer;text-decoration:underline;
+    text-underline-offset:3px;padding:0;transition:color .15s ease;
+  }
+  .again:hover{color:var(--ink);}
+  .again:focus-visible{outline:2px solid var(--link); outline-offset:3px;}
+
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-soft);line-height:1.7;}
+  footer a{color:var(--link);font-weight:600;text-decoration:none;}
+  footer a:hover{text-decoration:underline; text-underline-offset:3px;}
+
+  @media (max-width:480px){
+    .query-bar{flex-direction:column;}
+    .field-divider{width:auto;height:1px;margin:0 18px;}
+    .field, .field:first-child{flex:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="masthead-brand">
+      <svg class="masthead-mark" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M3 6c0-2 1.6-3.5 3.5-3.5S10 4 10 6s-1.6 3.5-3.5 3.5S3 11 3 13s1.6 3.5 3.5 3.5S10 15 10 13s1.6-3.5 3.5-3.5S17 11 17 13s-1.6 3.5-3.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="14.6" cy="4.8" r="1.15" fill="currentColor"/>
+      </svg>
+      <div class="masthead-name">Keyword Worth It?</div>
+    </div>
+    <div class="masthead-tag">from the SERPent team</div>
+  </div>
+
+  <h1>Would this <em>actually</em> rank, or is it a waste of an afternoon?</h1>
+  <p class="lede">Run the keyword like a query. You'll get back the result it would actually become — before you spend the hours writing it.</p>
+
+  <div class="query-bar">
+    <div class="field">
+      <label for="website">site</label>
+      <div class="field-input">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.2" cy="6.2" r="5.2" stroke="currentColor" stroke-width="1.5"/><line x1="9.9" y1="9.9" x2="13.5" y2="13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input type="text" id="website" placeholder="salesrobot.co" value="salesrobot.co">
+      </div>
+    </div>
+    <div class="field-divider" aria-hidden="true"></div>
+    <div class="field">
+      <label for="keyword">keyword</label>
+      <div class="field-input">
+        <span class="query-syntax">&ldquo;</span>
+        <input type="text" id="keyword" placeholder="best cold email software" value="best cold email software">
+        <span class="query-syntax">&rdquo;</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="run-row">
+    <button class="run-btn" id="runBtn" type="button">
+      <span class="spinner"></span>
+      <span id="runBtnLabel">run the query</span>
+    </button>
+  </div>
+  <div class="status-line" id="statusLine">reading the site...</div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div id="result">
+    <div class="result-eyebrow">here's what that post would look like</div>
+    <div class="snippet">
+      <div class="snippet-breadcrumb" id="snippetBreadcrumb"></div>
+      <p class="snippet-title" id="snippetTitle"></p>
+      <p class="snippet-desc" id="snippetDesc"></p>
+      <div class="snippet-meta">
+        <span>intent <b id="scoreIntent">-</b></span>
+        <span>buying stage <b id="scoreBuying">-</b></span>
+        <span>competition <b id="scoreCompetitive">-</b></span>
+      </div>
+      <p class="serp-note" id="serpNote"></p>
+      <div class="reasoning" id="reasoning"></div>
+    </div>
+
+    <div class="call-strip" id="callStrip">
+      <div class="stamp"><span id="callWord"></span></div>
+      <p id="callRest"></p>
+    </div>
+
+    <button class="again" id="runAgainBtn" type="button">run another keyword</button>
+  </div>
+
+  <footer>
+    From <a href="https://serpent.up.railway.app" target="_blank" rel="noopener">SERPent</a>, the keyword-to-blog pipeline — this is the sniff test that comes before it writes anything.
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const RELAY_URL = '/api/keyword-check';
+
+  const $ = (id) => document.getElementById(id);
+  const websiteEl = $('website');
+  const keywordEl = $('keyword');
+  const runBtn = $('runBtn');
+  const runBtnLabel = $('runBtnLabel');
+  const statusLine = $('statusLine');
+  const errorBox = $('errorBox');
+  const resultEl = $('result');
+  const snippetBreadcrumb = $('snippetBreadcrumb');
+  const snippetTitle = $('snippetTitle');
+  const snippetDesc = $('snippetDesc');
+  const scoreIntent = $('scoreIntent');
+  const scoreBuying = $('scoreBuying');
+  const scoreCompetitive = $('scoreCompetitive');
+  const serpNote = $('serpNote');
+  const reasoningEl = $('reasoning');
+  const callStrip = $('callStrip');
+  const callWord = $('callWord');
+  const callRest = $('callRest');
+  const runAgainBtn = $('runAgainBtn');
+
+  function showError(msg){
+    errorBox.textContent = msg;
+    errorBox.style.display = 'block';
+  }
+  function hideError(){ errorBox.style.display = 'none'; errorBox.textContent = ''; }
+
+  function extractProb(v){
+    if (v == null) return null;
+    if (typeof v === 'number') return v;
+    if (typeof v === 'object'){
+      if (typeof v.noul === 'number') return v.noul;
+      if (typeof v.score === 'number') return v.score;
+      if (typeof v.confidence === 'number') return v.confidence;
+      if (typeof v.probability === 'number') return v.probability;
+    }
+    return null;
+  }
+
+  // Jev's per-question answer object sometimes carries a natural-language
+  // justification alongside the score — field name isn't documented, so we
+  // check the common ones. Returns '' (shows nothing) if none are present.
+  function extractReason(v){
+    if (v == null || typeof v !== 'object') return '';
+    const candidates = ['reasoning', 'explanation', 'rationale', 'reason', 'why', 'justification', 'notes'];
+    for (const key of candidates){
+      if (typeof v[key] === 'string' && v[key].trim()) return v[key].trim();
+    }
+    return '';
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function slugFor(keyword){
+    return keyword.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40) || 'post';
+  }
+  function domainFor(website){
+    return website.replace(/^https?:\/\//i, '').replace(/\/$/, '');
+  }
+
+  async function run(){
+    hideError();
+    resultEl.classList.remove('show');
+    resultEl.style.display = 'none';
+
+    const website = websiteEl.value.trim();
+    const keyword = keywordEl.value.trim();
+    if (!website){ showError('Add your website first.'); return; }
+    if (!keyword){ showError('Add a keyword or topic idea.'); return; }
+
+    runBtn.disabled = true;
+    runBtn.classList.add('loading');
+    runBtnLabel.textContent = 'running...';
+    statusLine.classList.add('show');
+
+    try{
+      const res = await fetch(RELAY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ website: website, keyword: keyword })
+      });
+      const text = await res.text();
+      let data;
+      try{ data = JSON.parse(text); }catch(e){ data = { raw: text }; }
+
+      runBtn.disabled = false;
+      runBtn.classList.remove('loading');
+      runBtnLabel.textContent = 'run the query';
+      statusLine.classList.remove('show');
+
+      if (!res.ok){
+        showError(data.error || ('Something went wrong (' + res.status + '). Try again.'));
+        return;
+      }
+
+      const container = data.answers || data.questions || data.results || data;
+      const hasIntent = extractProb(container.has_real_intent);
+      const tooCompetitive = extractProb(container.too_competitive);
+      const buyingStage = extractProb(container.buying_stage);
+
+      if (hasIntent === null || tooCompetitive === null || buyingStage === null){
+        showError("Got a response but couldn't read the scores. Try again.");
+        return;
+      }
+
+      const reasons = {
+        intent: extractReason(container.has_real_intent),
+        buying: extractReason(container.buying_stage),
+        competitive: extractReason(container.too_competitive)
+      };
+
+      renderResult(website, keyword, hasIntent, tooCompetitive, buyingStage, !!data.serpGrounded, data.serpTopDomains || [], reasons);
+    }catch(err){
+      runBtn.disabled = false;
+      runBtn.classList.remove('loading');
+      runBtnLabel.textContent = 'run the query';
+      statusLine.classList.remove('show');
+      showError('Could not reach the checker. Try again in a moment.');
+    }
+  }
+
+  function renderResult(website, keyword, hasIntent, tooCompetitive, buyingStage, serpGrounded, serpTopDomains, reasons){
+    scoreIntent.textContent = Math.round(hasIntent * 100) + '%';
+    scoreBuying.textContent = Math.round(buyingStage * 100) + '%';
+    scoreCompetitive.textContent = Math.round(tooCompetitive * 100) + '%';
+
+    reasons = reasons || {};
+    const rows = [
+      ['intent', reasons.intent],
+      ['buying stage', reasons.buying],
+      ['competition', reasons.competitive]
+    ].filter(([, text]) => !!text);
+    if (rows.length){
+      reasoningEl.className = 'reasoning show';
+      reasoningEl.innerHTML = rows.map(([label, text]) =>
+        '<div class="why-row"><span class="why-label">' + label + '</span><span class="why-text">' + escapeHtml(text) + '</span></div>'
+      ).join('');
+    } else {
+      reasoningEl.className = 'reasoning';
+      reasoningEl.innerHTML = '';
+    }
+
+    if (serpGrounded && serpTopDomains.length){
+      serpNote.className = 'serp-note';
+      serpNote.innerHTML = 'Competition checked against today\'s top results — including <b>' + serpTopDomains.slice(0, 3).join('</b>, <b>') + '</b>.';
+    } else {
+      serpNote.className = 'serp-note estimate';
+      serpNote.textContent = 'Competition is an estimate — not checked against live search results.';
+    }
+
+    const domain = domainFor(website);
+    const slug = slugFor(keyword);
+    snippetBreadcrumb.textContent = domain + ' › blog › ' + slug;
+
+    let verdictCls, word, rest, title, desc;
+
+    // Verdict buckets, in priority order. NOTE: the cutoffs below (0.45,
+    // 0.65, 0.5, 0.55) are still uncalibrated defaults — nobody has tuned
+    // them against real outcomes yet. What IS fixed here: a keyword with
+    // high competition used to only get flagged as "Long shot" when buying
+    // stage was also low — a keyword with high competition AND a decent
+    // buying stage fell through to the generic "Maybe" bucket without ever
+    // mentioning competition, which was the real risk. Competition now gets
+    // flagged on its own, regardless of buying stage.
+    if (hasIntent < 0.45){
+      verdictCls = 'negative';
+      word = 'Skip it.'; rest = "The people searching this aren't the people who'd buy from you — ranking wouldn't matter.";
+      title = 'Why "' + keyword + '" isn\'t worth writing for ' + domain;
+      desc = "The search intent behind this keyword doesn't line up with what " + domain + ' actually solves. Even a page-one ranking would mostly bring the wrong readers.';
+    } else if (tooCompetitive >= 0.65){
+      verdictCls = 'negative';
+      word = 'Long shot.'; rest = 'Right audience, but this one\'s already owned by bigger, older sites.';
+      title = 'What it would take to rank for "' + keyword + '"';
+      desc = 'The intent is real, but this keyword is dominated by established sites. A newer site writing this exact post is competing uphill — a narrower angle on the same topic has better odds.';
+    } else if (hasIntent >= 0.6 && buyingStage >= 0.55 && tooCompetitive < 0.5){
+      verdictCls = '';
+      word = 'Write it.'; rest = 'Real intent, close to a buying decision, and the field is genuinely open.';
+      title = 'How "' + keyword + '" should read on ' + domain;
+      desc = 'This is close to what someone evaluating a solution like ' + domain + ' would actually search. Worth a full post, not just a mention.';
+    } else {
+      verdictCls = 'negative';
+      word = 'Maybe.'; rest = tooCompetitive >= 0.5
+        ? "Right audience, but the field is getting crowded — doable with a sharper angle, not a guaranteed win."
+        : "Not a clear win, not a clear miss — good as a supporting post, not the priority.";
+      title = 'Where "' + keyword + '" would land on the list';
+      desc = "Nothing here rules it out, but nothing makes it urgent either. Fine to queue behind stronger keywords.";
+    }
+
+    snippetTitle.textContent = title;
+    snippetDesc.textContent = desc;
+    callStrip.className = 'call-strip' + (verdictCls ? ' ' + verdictCls : '');
+    callWord.textContent = word;
+    callRest.textContent = rest;
+
+    resultEl.classList.add('show');
+    resultEl.style.display = 'block';
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  runBtn.addEventListener('click', run);
+  runAgainBtn.addEventListener('click', function(){
+    resultEl.classList.remove('show');
+    resultEl.style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    keywordEl.focus();
+  });
+})();
+</script>
+</body>
+</html>
