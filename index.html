@@ -8,181 +8,235 @@
 <meta name="color-scheme" content="light dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   /* ────────────────────────────────────────────────────────────────────
-     Minimal on purpose: one headline, one search bar, plain results.
-     The one flourish is a "decode" — the verdict scrambles through
-     random characters and resolves, scores count up, and the loading
-     line decodes each step. Everything else stays quiet.
+     A results page, stripped back. After a check, today's real top
+     results for the keyword are listed, and your post slides into the
+     list where the verdict puts it: among the top results (Write it),
+     at the edge of page one (Maybe), onto page two (Long shot), or off
+     the list entirely (Skip it). That's an illustration of the verdict,
+     not a rank prediction, and the page says so.
      ──────────────────────────────────────────────────────────────────── */
   :root{
-    --bg:#f6f5f2; --surface:#ffffff;
-    --ink:#161616; --ink-2:#5c5c5c; --ink-3:#9a9a9a;
-    --line:#e6e4df; --line-2:#d6d3cc;
-    --link:#2b44b8;
-    --write:#1f7a4c; --maybe:#a8741a; --long:#b8561c; --skip:#b33a3a;
-    --focus:rgba(43,68,184,.18);
-    --serif:'Instrument Serif', Georgia, serif;
-    --sans:'Geist', system-ui, -apple-system, sans-serif;
-    --mono:'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+    --bg:#ffffff; --bar:#ffffff; --field:#f1f3f4;
+    --ink:#202124; --ink-2:#4d5156; --ink-3:#70757a;
+    --line:#ebebeb; --line-2:#dadce0;
+    --link:#1a0dab; --visited:#681da8; --crumb:#202124;
+    --you:#1a73e8; --you-bg:#e8f0fe;
+    --write:#188038; --maybe:#b06000; --long:#c5221f; --skip:#80868b;
+    --shadow:0 1px 6px rgba(32,33,36,.18);
+    --font:'Arimo', Arial, Helvetica, sans-serif;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --bg:#0f0f10; --surface:#161618;
-      --ink:#ededed; --ink-2:#a1a1a1; --ink-3:#6b6b6b;
-      --line:#242426; --line-2:#333336;
-      --link:#8ea2ff;
-      --write:#5fcf95; --maybe:#e0b25a; --long:#e98e56; --skip:#ee7b7b;
-      --focus:rgba(142,162,255,.2);
+      --bg:#1f1f1f; --bar:#1f1f1f; --field:#303134;
+      --ink:#e8eaed; --ink-2:#bdc1c6; --ink-3:#9aa0a6;
+      --line:#3c4043; --line-2:#5f6368;
+      --link:#8ab4f8; --crumb:#dadce0;
+      --you:#8ab4f8; --you-bg:#233044;
+      --write:#81c995; --maybe:#fdd663; --long:#f28b82; --skip:#9aa0a6;
+      --shadow:0 1px 6px rgba(0,0,0,.5);
     }
   }
   :root[data-theme="dark"]{
-    --bg:#0f0f10; --surface:#161618;
-    --ink:#ededed; --ink-2:#a1a1a1; --ink-3:#6b6b6b;
-    --line:#242426; --line-2:#333336;
-    --link:#8ea2ff;
-    --write:#5fcf95; --maybe:#e0b25a; --long:#e98e56; --skip:#ee7b7b;
-    --focus:rgba(142,162,255,.2);
+    --bg:#1f1f1f; --bar:#1f1f1f; --field:#303134;
+    --ink:#e8eaed; --ink-2:#bdc1c6; --ink-3:#9aa0a6;
+    --line:#3c4043; --line-2:#5f6368;
+    --link:#8ab4f8; --crumb:#dadce0;
+    --you:#8ab4f8; --you-bg:#233044;
+    --write:#81c995; --maybe:#fdd663; --long:#f28b82; --skip:#9aa0a6;
+    --shadow:0 1px 6px rgba(0,0,0,.5);
   }
 
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   html{-webkit-text-size-adjust:100%;}
-  body{
-    background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;
-    -webkit-font-smoothing:antialiased;min-height:100vh;padding:0 16px;
-  }
-  ::selection{background:var(--ink);color:var(--bg);}
-  .wrap{max-width:640px;margin:0 auto;padding:28px 0 64px;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.58;min-height:100vh;}
+  ::selection{background:var(--you-bg);}
 
-  header{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--ink-3);}
-  .brand{color:var(--ink);font-weight:500;letter-spacing:-.01em;}
-  .brand span{font-family:var(--serif);font-style:italic;font-size:16px;font-weight:400;}
-
-  .hero{padding:17vh 0 0;}
-  @media (max-height:760px){ .hero{padding-top:12vh;} }
-  h1{
-    font-family:var(--serif);font-weight:400;font-size:clamp(40px,8.4vw,68px);line-height:1.02;letter-spacing:-.02em;
-    margin:0 0 20px;text-wrap:balance;
+  /* ── top bar ───────────────────────────────────────────────────── */
+  .top{
+    position:sticky;top:0;z-index:10;background:var(--bar);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:28px;padding:18px 28px 16px;
   }
-  h1 em{font-style:italic;}
-  .lede{margin:0 0 40px;max-width:44ch;color:var(--ink-2);font-size:16px;text-wrap:pretty;}
-
-  /* the search bar */
-  .bar{
-    display:flex;align-items:center;gap:0;background:var(--surface);
-    border:1px solid var(--line-2);border-radius:999px;padding:6px 6px 6px 22px;
-    transition:border-color .2s ease, box-shadow .2s ease;
+  .logo{flex:none;font-size:21px;font-weight:700;letter-spacing:-.02em;color:var(--ink);white-space:nowrap;}
+  .logo b{color:var(--you);font-weight:700;}
+  .search{
+    flex:1;max-width:690px;display:flex;align-items:center;min-width:0;
+    background:var(--bar);border:1px solid var(--line-2);border-radius:24px;height:46px;padding:0 6px 0 20px;
+    transition:box-shadow .15s ease, border-color .15s ease;
   }
-  .bar:focus-within{border-color:var(--ink-3);box-shadow:0 0 0 4px var(--focus);}
-  .bar label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
-  .bar input{
-    min-width:0;border:none;background:transparent;color:var(--ink);font:inherit;font-size:15px;padding:10px 0;
-  }
-  .bar input:focus{outline:none;}
-  .bar input::placeholder{color:var(--ink-3);}
-  #website{flex:0 0 34%;}
+  .search:hover,.search:focus-within{box-shadow:var(--shadow);border-color:transparent;}
+  .search label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  .search input{min-width:0;border:none;background:transparent;color:var(--ink);font:inherit;font-size:16px;height:100%;}
+  .search input:focus{outline:none;}
+  .search input::placeholder{color:var(--ink-3);}
   #keyword{flex:1;}
-  .sep{flex:none;width:1px;height:22px;background:var(--line-2);margin:0 16px;}
+  #website{flex:0 0 150px;color:var(--ink-2);font-size:14px;}
+  .site-chip{flex:none;display:flex;align-items:center;gap:6px;color:var(--ink-3);font-size:13px;margin-left:12px;padding-left:14px;border-left:1px solid var(--line-2);height:24px;}
+  .site-chip span{white-space:nowrap;}
   .run-btn{
-    flex:none;display:flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 18px;margin-left:10px;
-    border:none;border-radius:999px;background:var(--ink);color:var(--bg);font:inherit;font-size:14px;font-weight:500;cursor:pointer;
-    transition:opacity .15s ease, transform .1s ease;
+    flex:none;width:38px;height:38px;margin-left:6px;border:none;border-radius:50%;background:transparent;color:var(--you);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s ease;
   }
-  .run-btn:hover:not(:disabled){opacity:.86;}
-  .run-btn:active:not(:disabled){transform:scale(.97);}
-  .run-btn:focus-visible{outline:2px solid var(--ink);outline-offset:3px;}
-  .run-btn:disabled{opacity:.5;cursor:default;}
-  .run-btn .arrow{transition:transform .2s ease;}
-  .run-btn:hover:not(:disabled) .arrow{transform:translateX(2px);}
-  .spinner{display:none;width:12px;height:12px;border-radius:50%;border:1.5px solid currentColor;border-right-color:transparent;animation:spin .7s linear infinite;}
-  .run-btn.loading .spinner{display:inline-block;}
-  .run-btn.loading .arrow{display:none;}
+  .run-btn:hover:not(:disabled){background:var(--field);}
+  .run-btn:focus-visible{outline:2px solid var(--you);outline-offset:1px;}
+  .run-btn:disabled{cursor:default;}
+  #runBtnLabel{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  .spinner{display:none;width:18px;height:18px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--you);animation:spin .7s linear infinite;}
+  .run-btn.loading .spinner{display:block;}
+  .run-btn.loading .glass{display:none;}
   @keyframes spin{to{transform:rotate(360deg);}}
-  .hint{margin:12px 0 0 22px;font-size:12.5px;color:var(--ink-3);}
-  .hint kbd{font-family:var(--mono);font-size:11px;padding:1px 5px;border:1px solid var(--line-2);border-radius:4px;color:var(--ink-2);}
+  .by{flex:none;margin-left:auto;color:var(--ink-3);font-size:13px;white-space:nowrap;}
 
-  .status-line{display:none;margin:26px 0 0 22px;font-family:var(--mono);font-size:13px;color:var(--ink-2);}
-  .status-line.show{display:block;}
-  .status-line::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ink);margin-right:10px;vertical-align:2px;animation:breathe 1.2s ease-in-out infinite;}
-  @keyframes breathe{50%{opacity:.25;}}
-  .status-line .dots{display:none;}
+  /* loading bar under the top bar, like a results page fetching */
+  .top::after{content:"";position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--you);opacity:0;}
+  body:has(.status-line.show) .top::after{opacity:1;animation:fetch 2.4s cubic-bezier(.3,.7,.4,1) infinite;}
+  @keyframes fetch{0%{width:0;left:0;}60%{width:70%;left:0;}100%{width:0;left:100%;}}
 
-  .error-box{display:none;margin:24px 0 0 22px;color:var(--skip);font-size:14px;}
+  .meta{padding:12px 28px 0 calc(28px + 21px * 5.4 + 28px);color:var(--ink-3);font-size:13px;min-height:34px;}
+  .status-line{display:none;}
+  .status-line.show{display:inline;}
+  .status-line .dots::after{content:"…";}
 
-  /* result */
-  #result{display:none;margin-top:72px;}
-  #result.show{display:block;}
-  .result-eyebrow{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-bottom:14px;}
+  /* ── layout ────────────────────────────────────────────────────── */
+  .layout{--cols:minmax(0,652px) minmax(0,360px);--gap:76px;padding:6px 28px 60px calc(28px + 21px * 5.4 + 28px);}
 
-  .call-strip{--v:var(--write);margin:0 0 44px;}
-  .call-strip.negative{--v:var(--skip);}
-  .call-strip[data-verdict="Long shot."]{--v:var(--long);}
-  .call-strip[data-verdict="Maybe."]{--v:var(--maybe);}
-  .stamp{
-    font-family:var(--mono);font-weight:500;font-size:clamp(44px,11vw,84px);line-height:1;letter-spacing:-.045em;
-    color:var(--v);margin-bottom:16px;white-space:nowrap;min-height:1em;
+  .error-box{display:none;margin:6px 0 18px;color:var(--long);font-size:14px;}
+
+  /* empty state: what the tool is, set like a results page with no results yet */
+  .intro{padding-top:26px;max-width:600px;}
+  body:has(#result.show) .intro,
+  body:has(.status-line.show) .intro{display:none;}
+  .intro h1{font-size:28px;line-height:1.25;font-weight:400;letter-spacing:-.01em;margin:0 0 12px;color:var(--ink);}
+  .intro h1 em{font-style:normal;background:linear-gradient(transparent 62%, var(--you-bg) 62%);}
+  .intro .lede{margin:0 0 26px;font-size:16px;color:var(--ink-2);}
+  .intro ul{margin:0;padding:0;list-style:none;border-top:1px solid var(--line);}
+  .intro li{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);color:var(--ink-2);}
+  .intro li b{flex:none;width:86px;font-weight:600;}
+  .intro li:nth-child(1) b{color:var(--write);} .intro li:nth-child(2) b{color:var(--maybe);}
+  .intro li:nth-child(3) b{color:var(--long);} .intro li:nth-child(4) b{color:var(--skip);}
+
+  /* skeleton rows while loading */
+  .skeleton{display:none;max-width:652px;padding-top:10px;}
+  body:has(.status-line.show) .skeleton{display:block;}
+  .skeleton i{display:block;height:12px;border-radius:6px;background:var(--field);margin:14px 0;animation:shimmer 1.4s ease-in-out infinite;}
+  .skeleton i:nth-child(3n+1){width:32%;margin-top:30px;} .skeleton i:nth-child(3n+2){width:78%;height:18px;} .skeleton i:nth-child(3n){width:92%;}
+  @keyframes shimmer{50%{opacity:.45;}}
+
+  /* ── results ───────────────────────────────────────────────────── */
+  #result{display:none;}
+  /* !important: the script sets display:block inline when showing the result */
+  #result.show{display:grid !important;grid-template-columns:var(--cols);gap:0 var(--gap);align-items:start;}
+
+  .serp{list-style:none;margin:0;padding:0;}
+  .hit{padding:0 0 28px;}
+  #result.show .hit{animation:hit-in .35s ease both;animation-delay:calc(var(--i, 0) * 45ms);}
+  @keyframes hit-in{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+  .crumb{display:flex;align-items:center;gap:12px;margin-bottom:4px;min-width:0;}
+  .fav{
+    flex:none;width:28px;height:28px;border-radius:50%;background:var(--field);border:1px solid var(--line);
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;
   }
-  .stamp .glyph{color:var(--ink-3);}
-  .call-strip p{margin:0;max-width:46ch;font-family:var(--serif);font-size:24px;line-height:1.3;color:var(--ink);text-wrap:pretty;}
+  .crumb-text{min-width:0;display:flex;flex-direction:column;line-height:1.25;}
+  .crumb-text b{font-weight:400;font-size:14px;color:var(--crumb);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .crumb-text span{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hit h3{margin:0;font-size:20px;line-height:1.3;font-weight:400;color:var(--link);}
+  .rank{float:right;margin-left:12px;color:var(--ink-3);font-size:12px;font-variant-numeric:tabular-nums;}
 
-  .snippet{padding:22px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
-  .snippet-breadcrumb{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-2);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .favicon{flex:none;width:24px;height:24px;border-radius:50%;background:var(--surface);border:1px solid var(--line-2);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--ink-2);text-transform:uppercase;}
-  .snippet-title{font-size:20px;line-height:1.3;color:var(--link);margin:0 0 6px;font-weight:400;letter-spacing:-.005em;}
-  .snippet-desc{margin:0;font-size:14.5px;color:var(--ink-2);max-width:60ch;}
+  .page-break{
+    display:flex;align-items:center;gap:14px;margin:4px 0 26px;color:var(--ink-3);font-size:13px;
+  }
+  .page-break::before,.page-break::after{content:"";flex:1;height:1px;background:var(--line);}
 
-  .scores{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;padding:26px 0;border-bottom:1px solid var(--line);}
-  .gauge{display:flex;flex-direction:column;gap:6px;}
-  .gauge-label{font-size:12.5px;color:var(--ink-3);}
-  .gauge b{font-family:var(--mono);font-weight:400;font-size:30px;line-height:1.1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;}
-  .gauge-track{height:2px;background:var(--line);border-radius:2px;overflow:hidden;margin-top:6px;}
-  .gauge-fill{height:100%;width:0;background:var(--ink-3);transition:width 1.1s cubic-bezier(.16,1,.3,1) .1s;}
-  .gauge-fill.good{background:var(--write);} .gauge-fill.mid{background:var(--maybe);} .gauge-fill.bad{background:var(--skip);}
+  /* your post — the one moving part */
+  .post-slot{display:grid;grid-template-rows:0fr;transition:grid-template-rows .7s cubic-bezier(.2,.8,.2,1);}
+  .post-slot.in{grid-template-rows:1fr;}
+  .post-slot > .post{min-height:0;overflow:hidden;}
+  .post{
+    --v:var(--write);
+    position:relative;
+    opacity:0;transform:translateX(28px);transition:opacity .45s ease .25s, transform .7s cubic-bezier(.2,.8,.2,1) .15s;
+  }
+  .post-slot.in .post{opacity:1;transform:none;}
+  .post-inner{padding:16px 18px 16px;margin-bottom:28px;border-radius:12px;background:var(--you-bg);}
+  .post-tag{
+    display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;font-size:12px;font-weight:600;color:var(--v);
+  }
+  .post-tag::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--v);}
+  .post[data-verdict="Maybe."]{--v:var(--maybe);}
+  .post[data-verdict="Long shot."]{--v:var(--long);}
+  .post[data-verdict="Skip it."]{--v:var(--skip);}
+  .post[data-verdict="Skip it."] .post-inner{filter:grayscale(1);opacity:.6;}
+  .post[data-verdict="Skip it."] .snippet-title{text-decoration:line-through;text-decoration-thickness:1px;}
+  .post .snippet-breadcrumb{display:flex;align-items:center;gap:12px;margin-bottom:4px;font-size:14px;color:var(--crumb);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .post .favicon{flex:none;width:28px;height:28px;border-radius:50%;background:var(--bg);border:1px solid var(--line-2);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--you);text-transform:uppercase;}
+  .snippet-title{margin:0 0 4px;font-size:20px;line-height:1.3;color:var(--link);font-weight:400;}
+  .snippet-desc{margin:0;color:var(--ink-2);font-size:14px;}
 
-  .notes{padding-top:22px;}
-  .serp-note{margin:0;font-size:13.5px;color:var(--ink-2);}
-  .serp-note b{color:var(--ink);font-weight:500;}
-  .serp-note.estimate{color:var(--ink-3);}
-  .reasoning{display:none;margin-top:22px;}
-  .reasoning.show{display:grid;gap:14px;}
-  .reasoning .why-row{display:grid;grid-template-columns:110px 1fr;gap:16px;font-size:14px;}
-  .reasoning .why-label{font-size:12.5px;color:var(--ink-3);padding-top:1px;}
-  .reasoning .why-text{color:var(--ink-2);text-wrap:pretty;}
+  .serp-note{margin:4px 0 0;color:var(--ink-3);font-size:13px;}
+  .serp-note b{color:var(--ink-2);font-weight:600;}
+  .illus{margin:10px 0 0;color:var(--ink-3);font-size:12px;}
+
+  /* ── verdict panel (right column) ──────────────────────────────── */
+  .panel{position:sticky;top:104px;}
+  .card{border:1px solid var(--line);border-radius:12px;padding:20px 20px 18px;}
+  .call-strip{--v:var(--write);}
+  .call-strip.negative{--v:var(--long);}
+  .call-strip[data-verdict="Maybe."]{--v:var(--maybe);}
+  .call-strip[data-verdict="Skip it."]{--v:var(--skip);}
+  .panel-kicker{font-size:12px;color:var(--ink-3);margin-bottom:4px;}
+  .stamp{font-size:34px;line-height:1.15;font-weight:600;letter-spacing:-.02em;color:var(--v);margin-bottom:8px;}
+  .call-strip p{margin:0;font-size:15px;color:var(--ink-2);}
+
+  .scores{margin-top:18px;border-top:1px solid var(--line);}
+  .gauge{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 12px;padding:11px 0;border-bottom:1px solid var(--line);}
+  .gauge-label{color:var(--ink-2);font-size:14px;}
+  .gauge b{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;}
+  .gauge-track{grid-column:1/-1;height:4px;border-radius:2px;background:var(--field);overflow:hidden;}
+  .gauge-fill{height:100%;width:0;border-radius:2px;background:var(--ink-3);transition:width .9s cubic-bezier(.2,.8,.2,1) .3s;}
+  .gauge-fill.good{background:var(--write);} .gauge-fill.mid{background:var(--maybe);} .gauge-fill.bad{background:var(--long);}
+
+  .reasoning{display:none;margin-top:14px;}
+  .reasoning.show{display:block;}
+  .reasoning .why-row{padding:8px 0;font-size:13.5px;color:var(--ink-2);}
+  .reasoning .why-label{display:block;font-size:12px;color:var(--ink-3);}
+  .reasoning .why-text{display:block;}
 
   .again{
-    margin-top:36px;padding:0;border:none;background:none;cursor:pointer;font:inherit;font-size:14px;color:var(--ink);
-    border-bottom:1px solid var(--line-2);transition:border-color .15s ease;
+    margin-top:16px;padding:9px 16px;border:1px solid var(--line-2);border-radius:18px;background:transparent;color:var(--you);
+    font:inherit;font-size:14px;font-weight:500;cursor:pointer;transition:background .15s ease;
   }
-  .again:hover{border-color:var(--ink);}
-  .again:focus-visible{outline:2px solid var(--ink);outline-offset:4px;}
+  .again:hover{background:var(--field);}
+  .again:focus-visible{outline:2px solid var(--you);outline-offset:2px;}
 
-  /* gentle fade-up for everything after the verdict */
-  #result.show > *:not(.call-strip){animation:rise .6s cubic-bezier(.16,1,.3,1) both;}
-  #result.show > .snippet{animation-delay:.55s;}
-  #result.show > .scores{animation-delay:.65s;}
-  #result.show > .notes{animation-delay:.75s;}
-  #result.show > .again{animation-delay:.85s;}
-  #result.show .call-strip p{animation:rise .6s cubic-bezier(.16,1,.3,1) .45s both;}
-  @keyframes rise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  #result.show .panel{animation:hit-in .4s ease .1s both;}
 
-  footer{margin-top:96px;font-size:13px;color:var(--ink-3);}
-  footer a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--line-2);}
-  footer a:hover{color:var(--ink);border-color:var(--ink);}
+  footer{padding:18px 28px;border-top:1px solid var(--line);background:var(--field);color:var(--ink-3);font-size:13px;}
+  footer a{color:var(--ink-2);}
 
-  @media (max-width:560px){
-    .hero{padding-top:9vh;}
-    .bar{flex-wrap:wrap;border-radius:18px;padding:4px 6px 6px 16px;}
-    #website,#keyword{flex:1 1 100%;width:100%;padding:12px 0;}
-    #website{border-bottom:1px solid var(--line);}
-    .sep{display:none;}
-    .run-btn{flex:1 1 100%;margin:6px 0 0 -10px;}
-    .hint{display:none;}
-    .status-line,.error-box{margin-left:4px;}
-    .scores{gap:14px;}
-    .gauge b{font-size:24px;}
-    .reasoning .why-row{grid-template-columns:1fr;gap:2px;}
+  /* ── smaller screens ───────────────────────────────────────────── */
+  @media (max-width:1100px){
+    .meta,.layout{padding-left:28px;}
+    .layout{--cols:minmax(0,652px) minmax(0,320px);--gap:40px;}
+  }
+  @media (max-width:860px){
+    .top{flex-wrap:wrap;gap:12px 16px;padding:14px 16px 12px;}
+    .by{display:none;}
+    .search{flex:1 1 100%;max-width:none;order:3;}
+    .meta{padding:10px 16px 0;}
+    .layout{padding:4px 16px 48px;}
+    #result.show{display:flex !important;flex-direction:column;}
+    .panel{position:static;order:-1;margin-bottom:26px;}
+  }
+  @media (max-width:520px){
+    .search{height:auto;flex-wrap:wrap;border-radius:18px;padding:4px 6px 4px 16px;}
+    #keyword{flex:1 1 calc(100% - 50px);height:44px;}
+    .site-chip{flex:1 1 100%;order:3;margin:0 0 6px;padding:6px 0 0;border-left:none;border-top:1px solid var(--line);height:auto;}
+    #website{flex:1;}
+    .hit h3,.snippet-title{font-size:18px;}
+    .intro h1{font-size:24px;}
   }
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{animation-duration:.01ms !important;animation-delay:0ms !important;transition-duration:.01ms !important;transition-delay:0ms !important;}
@@ -190,70 +244,88 @@
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <span class="brand">Keyword Worth It<span>?</span></span>
-    <span>from the SERPent team</span>
-  </header>
+<header class="top">
+  <span class="logo">Keyword Worth It<b>?</b></span>
+  <form class="search" id="queryForm" onsubmit="return false;" role="search">
+    <label for="keyword">keyword</label>
+    <input type="text" id="keyword" placeholder="best cold email software" value="best cold email software" autocomplete="off" spellcheck="false">
+    <span class="site-chip">
+      <span>for</span>
+      <label for="website">site</label>
+      <input type="text" id="website" placeholder="salesrobot.co" value="salesrobot.co" autocomplete="url" spellcheck="false" autocapitalize="off">
+    </span>
+    <button class="run-btn" id="runBtn" type="button" title="run the query">
+      <span class="spinner"></span>
+      <svg class="glass" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5 20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span id="runBtnLabel">run the query</span>
+    </button>
+  </form>
+  <span class="by">from the SERPent team</span>
+</header>
 
-  <main>
-    <section class="hero">
-      <h1>Would this <em>actually</em> rank, or is it a waste of an afternoon?</h1>
-      <p class="lede">Run the keyword like a query. You'll get back the result it would actually become — before you spend the hours writing it.</p>
-
-      <form class="bar" id="queryForm" onsubmit="return false;">
-        <label for="website">site</label>
-        <input type="text" id="website" placeholder="salesrobot.co" value="salesrobot.co" autocomplete="url" spellcheck="false" autocapitalize="off">
-        <span class="sep" aria-hidden="true"></span>
-        <label for="keyword">keyword</label>
-        <input type="text" id="keyword" placeholder="best cold email software" value="best cold email software" autocomplete="off" spellcheck="false">
-        <button class="run-btn" id="runBtn" type="button">
-          <span class="spinner"></span>
-          <span id="runBtnLabel">run the query</span>
-          <svg class="arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h9.5M7.5 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </form>
-      <p class="hint">site, then keyword · <kbd>Enter</kbd> to run</p>
-
-      <div class="status-line" id="statusLine" role="status" aria-live="polite"><span id="statusText">reading the site</span><span class="dots"></span></div>
-      <div class="error-box" id="errorBox" role="alert"></div>
-    </section>
-
-    <section id="result" aria-live="polite">
-      <div class="call-strip" id="callStrip">
-        <div class="result-eyebrow">verdict</div>
-        <div class="stamp" aria-live="off"><span id="callWord"></span></div>
-        <p id="callRest"></p>
-      </div>
-
-      <div class="result-eyebrow">here's what that post would look like</div>
-      <article class="snippet">
-        <div class="snippet-breadcrumb"><span class="favicon" id="snippetFavicon" aria-hidden="true"></span><span id="snippetBreadcrumb"></span></div>
-        <p class="snippet-title" id="snippetTitle"></p>
-        <p class="snippet-desc" id="snippetDesc"></p>
-      </article>
-
-      <div class="scores">
-        <div class="gauge"><span class="gauge-label">intent</span><b id="scoreIntent">-</b><div class="gauge-track"><div class="gauge-fill" id="barIntent"></div></div></div>
-        <div class="gauge"><span class="gauge-label">buying stage</span><b id="scoreBuying">-</b><div class="gauge-track"><div class="gauge-fill" id="barBuying"></div></div></div>
-        <div class="gauge"><span class="gauge-label">competition</span><b id="scoreCompetitive">-</b><div class="gauge-track"><div class="gauge-fill" id="barCompetitive"></div></div></div>
-      </div>
-
-      <div class="notes">
-        <p class="serp-note" id="serpNote"></p>
-        <div class="reasoning" id="reasoning"></div>
-      </div>
-
-      <button class="again" id="runAgainBtn" type="button">run another keyword</button>
-    </section>
-  </main>
-
-  <footer>
-    From <a href="https://serpent.up.railway.app" target="_blank" rel="noopener">SERPent</a>, the keyword-to-blog pipeline — this is the sniff test that comes before it writes anything.
-  </footer>
-
+<div class="meta">
+  <span class="status-line" id="statusLine" role="status" aria-live="polite"><span id="statusText">reading the site</span><span class="dots"></span></span>
+  <span id="serpMeta"></span>
 </div>
+
+<main class="layout">
+  <div class="error-box" id="errorBox" role="alert"></div>
+
+  <section class="intro">
+    <h1>Would this <em>actually</em> rank, or is it a waste of an afternoon?</h1>
+    <p class="lede">Run the keyword like a query. You'll get back the result it would actually become — before you spend the hours writing it.</p>
+    <ul>
+      <li><b>Write it.</b><span>Your post slides in among today's top results.</span></li>
+      <li><b>Maybe.</b><span>It lands on the edge of page one.</span></li>
+      <li><b>Long shot.</b><span>It drops to page two, behind bigger sites.</span></li>
+      <li><b>Skip it.</b><span>Wrong audience, so ranking wouldn't matter.</span></li>
+    </ul>
+  </section>
+
+  <div class="skeleton" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+  <section id="result" aria-live="polite">
+    <div class="results">
+      <ol class="serp" id="serpList"></ol>
+
+      <div class="post-slot" id="postSlot">
+        <article class="post" id="post">
+          <div class="post-inner">
+            <div class="post-tag" id="postTag">your post</div>
+            <div class="snippet-breadcrumb"><span class="favicon" id="snippetFavicon" aria-hidden="true"></span><span id="snippetBreadcrumb"></span></div>
+            <p class="snippet-title" id="snippetTitle"></p>
+            <p class="snippet-desc" id="snippetDesc"></p>
+          </div>
+        </article>
+      </div>
+
+      <p class="serp-note" id="serpNote"></p>
+      <p class="illus">Where your post appears shows the verdict, not a predicted rank.</p>
+    </div>
+
+    <aside class="panel">
+      <div class="card">
+        <div class="call-strip" id="callStrip">
+          <div class="panel-kicker">verdict</div>
+          <div class="stamp"><span id="callWord"></span></div>
+          <p id="callRest"></p>
+        </div>
+        <div class="scores">
+          <div class="gauge"><span class="gauge-label">intent</span><b id="scoreIntent">-</b><div class="gauge-track"><div class="gauge-fill" id="barIntent"></div></div></div>
+          <div class="gauge"><span class="gauge-label">buying stage</span><b id="scoreBuying">-</b><div class="gauge-track"><div class="gauge-fill" id="barBuying"></div></div></div>
+          <div class="gauge"><span class="gauge-label">competition</span><b id="scoreCompetitive">-</b><div class="gauge-track"><div class="gauge-fill" id="barCompetitive"></div></div></div>
+        </div>
+        <div class="reasoning" id="reasoning"></div>
+        <button class="again" id="runAgainBtn" type="button">run another keyword</button>
+      </div>
+    </aside>
+  </section>
+</main>
+
+<footer>
+  From <a href="https://serpent.up.railway.app" target="_blank" rel="noopener">SERPent</a>, the keyword-to-blog pipeline — this is the sniff test that comes before it writes anything.
+</footer>
 
 <script>
 (function(){
@@ -285,28 +357,9 @@
   const callRest = $('callRest');
   const runAgainBtn = $('runAgainBtn');
 
-  // The one effect on the page: "decode". Text scrambles through random
-  // glyphs and resolves left to right into its real value. Purely
-  // presentational — the final text is always exactly what was set.
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%#*+=/<>';
-  function decode(el, finalText, duration){
-    if (el._decodeTimer) clearInterval(el._decodeTimer);
-    if (reduceMotion){ el.textContent = finalText; return; }
-    const start = performance.now();
-    const len = finalText.length;
-    el._decodeTimer = setInterval(function(){
-      const t = Math.min(1, (performance.now() - start) / duration);
-      const settled = Math.floor(t * len);
-      let out = '';
-      for (let i = 0; i < len; i++){
-        const ch = finalText[i];
-        out += (i < settled || ch === ' ') ? ch : GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
-      }
-      el.textContent = out;
-      if (t >= 1){ clearInterval(el._decodeTimer); el._decodeTimer = null; el.textContent = finalText; }
-    }, 40);
-  }
+
+  // Scores count up to their value. Presentational only.
   function countUp(el, finalText, duration){
     const target = parseInt(finalText, 10);
     if (reduceMotion || isNaN(target)){ el.textContent = finalText; return; }
@@ -325,11 +378,11 @@
   let statusTimer = null;
   function startStatus(){
     let i = 0;
-    decode(statusText, STATUS_STEPS[0], 500);
+    statusText.textContent = STATUS_STEPS[0];
     statusLine.classList.add('show');
     clearInterval(statusTimer);
     statusTimer = setInterval(function(){
-      if (i < STATUS_STEPS.length - 1){ i++; decode(statusText, STATUS_STEPS[i], 500); }
+      if (i < STATUS_STEPS.length - 1){ i++; statusText.textContent = STATUS_STEPS[i]; }
     }, 2600);
   }
   function stopStatus(){
@@ -392,6 +445,85 @@
     });
   }
 
+  // ── Live results list ────────────────────────────────────────────
+  // Today's real top results (from the backend's Serper lookup) are listed,
+  // and "your post" slides into the list at a spot that illustrates the
+  // verdict. That spot is NOT a predicted rank: the page says so, and the
+  // real results keep their real positions (#1, #2, ...).
+  const serpList = $('serpList');
+  const serpMeta = $('serpMeta');
+  const postSlot = $('postSlot');
+  const postEl = $('post');
+  const postTag = $('postTag');
+  let lastTopResults = [];
+  let postTimer = null;
+
+  function hitEl(r, i){
+    const li = document.createElement('li');
+    li.className = 'hit';
+    li.style.setProperty('--i', i);
+    const rank = document.createElement('span');
+    rank.className = 'rank';
+    rank.textContent = '#' + (i + 1);
+    const crumb = document.createElement('div');
+    crumb.className = 'crumb';
+    const fav = document.createElement('span');
+    fav.className = 'fav';
+    fav.textContent = String(r.domain || '·').charAt(0);
+    const text = document.createElement('span');
+    text.className = 'crumb-text';
+    const name = document.createElement('b');
+    name.textContent = r.domain;
+    const url = document.createElement('span');
+    url.textContent = 'https://' + r.domain;
+    text.append(name, url);
+    crumb.append(fav, text);
+    const h3 = document.createElement('h3');
+    h3.textContent = r.title || r.domain;
+    li.append(rank, crumb, h3);
+    return li;
+  }
+
+  function placePost(word, keyword, grounded){
+    const results = grounded ? lastTopResults.filter(function(r){ return r && r.domain; }).slice(0, 10) : [];
+    const n = results.length;
+    let at, tag, divider = '';
+    if (word === 'Write it.'){ at = Math.min(2, n); tag = 'your post · could compete here'; }
+    else if (word === 'Maybe.'){ at = Math.max(0, n - 1); tag = 'your post · on the edge of page one'; }
+    else if (word === 'Long shot.'){ at = n; tag = 'your post · page two'; divider = n ? 'page 2' : ''; }
+    else { at = n; tag = 'your post · wrong audience'; divider = n ? 'not in the running' : ''; }
+
+    if (!n) tag = 'your post';  // no live list, so no position to describe
+    serpList.textContent = '';
+    postEl.dataset.verdict = word;
+    postTag.textContent = tag;
+    const slotLi = document.createElement('li');
+    slotLi.className = 'slot-li';
+    results.forEach(function(r, i){
+      if (i === at) serpList.append(slotLi);
+      serpList.append(hitEl(r, i));
+    });
+    if (at >= n){
+      if (divider){
+        const br = document.createElement('li');
+        br.className = 'page-break';
+        br.textContent = divider;
+        serpList.append(br);
+      }
+      serpList.append(slotLi);
+    }
+    slotLi.append(postSlot);
+
+    serpMeta.textContent = n
+      ? "Today's top " + n + ' results for “' + keyword + '”'
+      : 'Live results unavailable, so this shows your post on its own';
+
+    clearTimeout(postTimer);
+    postSlot.classList.remove('in');
+    if (reduceMotion){ postSlot.classList.add('in'); return; }
+    postTimer = setTimeout(function(){ postSlot.classList.add('in'); }, 300 + n * 45);
+  }
+
   async function run(){
     if (runBtn.disabled) return;
     hideError();
@@ -428,6 +560,9 @@
         return;
       }
 
+      lastTopResults = Array.isArray(data.serpTopResults)
+        ? data.serpTopResults
+        : (data.serpTopDomains || []).map(function(d){ return { domain: d, title: '' }; });
       const container = data.answers || data.questions || data.results || data;
       const hasIntent = extractProb(container.has_real_intent);
       const tooCompetitive = extractProb(container.too_competitive);
@@ -534,7 +669,7 @@
 
     resultEl.classList.add('show');
     resultEl.style.display = 'block';
-    decode(callWord, word, 900);
+    placePost(word, keyword, serpGrounded);
     [scoreIntent, scoreBuying, scoreCompetitive].forEach(function(el){ countUp(el, el.textContent, 1100); });
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }

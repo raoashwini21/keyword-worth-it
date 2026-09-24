@@ -64,6 +64,10 @@ test('happy path: passes Jev answers through with SERP grounding attached', asyn
   assert.deepEqual(r.body.answers, JEV_OK.answers, 'per-axis reasoning fields preserved');
   assert.equal(r.body.serpGrounded, true);
   assert.deepEqual(r.body.serpTopDomains, ['g2.com', 'hubspot.com']);
+  assert.deepEqual(r.body.serpTopResults, [
+    { domain: 'g2.com', title: 'Best cold email software 2026' },
+    { domain: 'hubspot.com', title: 'Top tools' },
+  ]);
   assert.equal(r.headers['x-cache'], 'MISS');
 });
 

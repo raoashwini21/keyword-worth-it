@@ -17,7 +17,8 @@
 //     server-side with a ref id (lib/log.js).
 //
 // Response shape on success is unchanged: Jev's JSON, plus serpGrounded,
-// serpTopDomains and (if grounding failed) serpError.
+// serpTopDomains, serpTopResults (today's top 10 as { domain, title }) and
+// (if grounding failed) serpError.
 
 import { safeFetchText, assertPublicUrl, BlockedUrlError } from '../lib/safe-fetch.js';
 import { createRateLimiter } from '../lib/rate-limit.js';
@@ -252,6 +253,7 @@ async function runCheck(website, keyword, log) {
   // was actually checked against (or be honest that it wasn't).
   data.serpGrounded = serp.results.length > 0;
   data.serpTopDomains = serp.results.slice(0, 5).map(r => r.domain);
+  data.serpTopResults = serp.results.map(r => ({ domain: r.domain, title: r.title }));
   if (serp.error) data.serpError = serp.error;
 
   // Don't pin a transient SERP outage into the cache for 24h — only cache
