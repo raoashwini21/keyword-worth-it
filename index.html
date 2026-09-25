@@ -126,12 +126,14 @@
   /* ── hero: idle copy, then the "now" block ─────────────────────── */
   .idle{text-align:center;padding:12vh 8px 4vh;}
   body:not([data-sky="idle"]) .idle{display:none;}
-  .idle .icon{margin:0 auto 18px;opacity:.9;}
+  .idle .icon{display:block;margin:0 auto 18px;color:#fff;opacity:.95;}
   .idle h1{margin:0 auto 14px;max-width:18ch;font-size:clamp(30px,6.4vw,46px);line-height:1.1;font-weight:300;letter-spacing:-.02em;text-shadow:0 1px 12px rgba(0,0,0,.12);}
   .idle h1 em{font-style:normal;font-weight:500;}
   .idle .lede{margin:0 auto;max-width:42ch;color:var(--text-2);font-size:16px;}
   .legend{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:26px;}
-  .legend span{padding:6px 12px;border-radius:999px;background:var(--tile);border:1px solid var(--tile-line);font-size:13px;color:var(--text-2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+  .legend span{display:inline-flex;align-items:center;gap:6px;padding:6px 12px 6px 9px;border-radius:999px;background:var(--tile);border:1px solid var(--tile-line);font-size:13px;color:var(--text-2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+  .legend span b{color:var(--text);font-weight:500;}
+  .legend svg{flex:none;width:18px;height:18px;color:var(--text);}
 
   #result{display:none;}
   #result.show{display:block;}
@@ -140,7 +142,9 @@
   .place{font-size:30px;font-weight:400;letter-spacing:-.01em;margin:0;text-shadow:0 1px 10px rgba(0,0,0,.12);}
   .query{margin:2px 0 0;color:var(--text-2);font-size:15px;}
   .wx{display:flex;align-items:center;justify-content:center;gap:14px;margin:18px 0 4px;}
-  .wx svg{display:none;flex:none;filter:drop-shadow(0 2px 10px rgba(0,0,0,.12));}
+  .wx svg{display:none;flex:none;color:#fff;filter:drop-shadow(0 2px 10px rgba(0,0,0,.14));}
+  .wx-label{margin:4px 0 2px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);}
+  .wx-label:empty{display:none;}
   .call-strip[data-verdict="Write it."] .wx .i-clear,
   .call-strip[data-verdict="Maybe."] .wx .i-cloudy,
   .call-strip[data-verdict="Long shot."] .wx .i-storm,
@@ -234,6 +238,68 @@
 </head>
 <body data-sky="idle">
 
+<!-- Forecast icon set: one family, one grid (24×24), 1.75 stroke,
+     round caps and joins, no fills (the calm dot is the only small accent).
+     Body in currentColor; sun and lightning in the warm accent. Each icon
+     pairs a weather condition with a ranking/trend mark. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <mask id="wx-cloud-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+      <rect width="24" height="24" fill="#fff"/>
+      <path d="M8 17H17.5A3 3 0 0 0 17.5 11A4.5 4.5 0 0 0 9.25 12.25A2.5 2.5 0 0 0 8 17Z" fill="#000" stroke="#000" stroke-width="3"/>
+    </mask>
+  </defs>
+
+  <!-- Clear skies: sun; the upper-right ray rises into a trend arrow -->
+  <symbol id="wx-clear" viewBox="0 0 24 24">
+    <g fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <g stroke="#FFD76A">
+        <circle cx="10" cy="13" r="3.5"/>
+        <path d="M10 8V6.25M10 18v1.75M5 13H3.25M15 13h1.75M6.46 9.46 5.23 8.23M6.46 16.54 5.23 17.77M13.54 16.54l1.23 1.23M13.54 9.46l1.21-1.21"/>
+      </g>
+      <g stroke="currentColor">
+        <path d="M14.75 8.25 16.5 7.25 18 8 21 5"/>
+        <path d="M18.75 5H21v2.25"/>
+      </g>
+    </g>
+  </symbol>
+
+  <!-- Partly cloudy: sun half behind a cloud; a flat zigzag trend beneath -->
+  <symbol id="wx-cloudy" viewBox="0 0 24 24">
+    <g fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <g stroke="#FFD76A" mask="url(#wx-cloud-cut)">
+        <circle cx="9" cy="8.5" r="3"/>
+        <path d="M9 4.25V3M4.75 8.5H3.5M6 5.5 5.1 4.6M12 5.5l.9-.9"/>
+      </g>
+      <g stroke="currentColor">
+        <path d="M8 17H17.5A3 3 0 0 0 17.5 11A4.5 4.5 0 0 0 9.25 12.25A2.5 2.5 0 0 0 8 17Z"/>
+        <path d="M5 21 7 20l2 1 2-1 2 1 2-1 2 1 2-1"/>
+      </g>
+    </g>
+  </symbol>
+
+  <!-- Storm warning: rain cloud with a bolt; a steep mountain to climb beneath -->
+  <symbol id="wx-storm" viewBox="0 0 24 24">
+    <g fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <g stroke="currentColor">
+        <path d="M5 9.5H14.5A3 3 0 0 0 14.5 3.5A4.5 4.5 0 0 0 6.25 4.75A2.5 2.5 0 0 0 5 9.5Z"/>
+        <path d="M6.25 11.75 5.75 13.25M12.5 11.5 12 13"/>
+        <path d="M3 21.5 7 18.5 9 19.75 15 14.5 21 21.5"/>
+      </g>
+      <path d="M9.6 10.75 8.4 13h2L9.4 15" stroke="#FFD76A"/>
+    </g>
+  </symbol>
+
+  <!-- Dead calm: a flatline trend ending in a dot; still ripples beneath -->
+  <symbol id="wx-calm" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3.5 10h14.5"/>
+      <path d="M5.5 14.5q1.25-1 2.5 0t2.5 0M13.5 14.5q1.25-1 2.5 0t2.5 0M9.5 18.5q1.25-1 2.5 0t2.5 0" opacity=".7"/>
+    </g>
+    <circle cx="20.5" cy="10" r="1.25" fill="currentColor"/>
+  </symbol>
+</svg>
+
 <div class="sky" aria-hidden="true">
   <div class="sun"></div>
   <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
@@ -252,17 +318,22 @@
     <span class="for">for</span>
     <label for="website">site</label>
     <input type="text" id="website" placeholder="salesrobot.co" value="salesrobot.co" autocomplete="url" spellcheck="false" autocapitalize="off">
-    <button class="run-btn" id="runBtn" type="button"><span class="spinner"></span><span id="runBtnLabel">run the query</span></button>
+    <button class="run-btn" id="runBtn" type="button"><span class="spinner"></span><span id="runBtnLabel">check the forecast</span></button>
   </form>
 
-  <div class="status-line" id="statusLine" role="status" aria-live="polite"><span id="statusText">reading the site</span><span class="dots"></span></div>
+  <div class="status-line" id="statusLine" role="status" aria-live="polite"><span id="statusText">reading the skies</span><span class="dots"></span></div>
   <div class="error-box" id="errorBox" role="alert"></div>
 
   <section class="idle">
-    <svg class="icon" width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="10" fill="#FFD76A"/><path d="M24 6v4M24 38v4M6 24h4M38 24h4M11.3 11.3l2.8 2.8M33.9 33.9l2.8 2.8M11.3 36.7l2.8-2.8M33.9 14.1l2.8-2.8" stroke="#FFD76A" stroke-width="2.5" stroke-linecap="round"/><path d="M22 52h26a10 10 0 0 0 0-20 13 13 0 0 0-25 3.5A8.3 8.3 0 0 0 22 52Z" fill="#fff" fill-opacity=".95"/></svg>
+    <svg class="icon" width="72" height="72" aria-hidden="true"><use href="#wx-cloudy"/></svg>
     <h1>Would this <em>actually</em> rank, or is it a waste of an afternoon?</h1>
     <p class="lede">Run the keyword like a query. You'll get back the result it would actually become — before you spend the hours writing it.</p>
-    <div class="legend"><span>☀ Write it</span><span>⛅ Maybe</span><span>⛈ Long shot</span><span>🌫 Skip it</span></div>
+    <div class="legend">
+      <span><svg aria-hidden="true"><use href="#wx-clear"/></svg><b>Clear skies</b> Write it</span>
+      <span><svg aria-hidden="true"><use href="#wx-cloudy"/></svg><b>Partly cloudy</b> Maybe</span>
+      <span><svg aria-hidden="true"><use href="#wx-storm"/></svg><b>Storm warning</b> Long shot</span>
+      <span><svg aria-hidden="true"><use href="#wx-calm"/></svg><b>Dead calm</b> Skip it</span>
+    </div>
   </section>
 
   <section id="result" aria-live="polite">
@@ -270,11 +341,12 @@
       <p class="place" id="nowPlace"></p>
       <p class="query" id="nowQuery"></p>
       <div class="wx">
-        <svg class="i-clear" width="56" height="56" viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="12" fill="#FFD76A"/><path d="M32 8v6M32 50v6M8 32h6M50 32h6M15 15l4.2 4.2M44.8 44.8 49 49M15 49l4.2-4.2M44.8 19.2 49 15" stroke="#FFD76A" stroke-width="3" stroke-linecap="round"/></svg>
-        <svg class="i-cloudy" width="60" height="56" viewBox="0 0 64 60" fill="none" aria-hidden="true"><circle cx="22" cy="20" r="10" fill="#FFD76A"/><path d="M20 50h28a11 11 0 0 0 0-22 14 14 0 0 0-27 4 9 9 0 0 0-1 18Z" fill="#fff"/></svg>
-        <svg class="i-storm" width="60" height="60" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M18 38h30a11 11 0 0 0 0-22 14 14 0 0 0-27 4 9 9 0 0 0-3 18Z" fill="#dfe6ee"/><path d="m34 36-7 12h7l-4 11 12-15h-8l5-8" fill="#FFD76A"/><path d="M20 44l-3 7M47 44l-3 7" stroke="#9cc3ff" stroke-width="3" stroke-linecap="round"/></svg>
-        <svg class="i-fog" width="60" height="56" viewBox="0 0 64 60" fill="none" aria-hidden="true"><path d="M8 22h40M14 32h44M6 42h38M16 52h34" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-opacity=".9"/></svg>
+        <svg class="wx-icon i-clear" width="84" height="84" aria-hidden="true"><use href="#wx-clear"/></svg>
+        <svg class="wx-icon i-cloudy" width="84" height="84" aria-hidden="true"><use href="#wx-cloudy"/></svg>
+        <svg class="wx-icon i-storm" width="84" height="84" aria-hidden="true"><use href="#wx-storm"/></svg>
+        <svg class="wx-icon i-fog" width="84" height="84" aria-hidden="true"><use href="#wx-calm"/></svg>
       </div>
+      <p class="wx-label" id="wxLabel"></p>
       <div class="stamp"><span id="callWord"></span></div>
       <p id="callRest"></p>
     </div>
@@ -363,7 +435,7 @@
 
   // The request runs three steps server-side (site → today's top ten → verdict);
   // the status line walks through them so the wait reads as work, not a hang.
-  const STATUS_STEPS = ['reading the site', "checking today's top ten", 'weighing the verdict'];
+  const STATUS_STEPS = ['reading the skies', "checking today's top ten", 'weighing the verdict'];
   let statusTimer = null;
   function startStatus(){
     let i = 0;
@@ -442,6 +514,8 @@
   const nowQuery = $('nowQuery');
   const rivalList = $('rivalList');
   const SKY = { 'Write it.': 'clear', 'Maybe.': 'cloudy', 'Long shot.': 'storm', 'Skip it.': 'fog' };
+  const FORECAST_LABEL = { 'Write it.': 'Clear skies', 'Maybe.': 'Partly cloudy', 'Long shot.': 'Storm warning', 'Skip it.': 'Dead calm' };
+  const wxLabel = $('wxLabel');
   let lastTopResults = [];
 
   function setSky(name){ document.body.dataset.sky = name; }
@@ -449,6 +523,7 @@
   function setForecast(word, keyword, domain, grounded){
     setSky(SKY[word] || 'idle');
     callStrip.dataset.verdict = word;
+    wxLabel.textContent = FORECAST_LABEL[word] || '';
     nowPlace.textContent = domain;
     nowQuery.textContent = '“' + keyword + '”';
 
@@ -499,7 +574,7 @@
 
       runBtn.disabled = false;
       runBtn.classList.remove('loading');
-      runBtnLabel.textContent = 'run the query';
+      runBtnLabel.textContent = 'check the forecast';
       stopStatus();
 
       if (!res.ok){
@@ -530,7 +605,7 @@
     }catch(err){
       runBtn.disabled = false;
       runBtn.classList.remove('loading');
-      runBtnLabel.textContent = 'run the query';
+      runBtnLabel.textContent = 'check the forecast';
       stopStatus();
       showError('Could not reach the checker. Try again in a moment.');
     }
