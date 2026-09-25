@@ -658,6 +658,9 @@
     // buying stage fell through to the generic "Maybe" bucket without ever
     // mentioning competition, which was the real risk. Competition now gets
     // flagged on its own, regardless of buying stage.
+    // "Write it" allows competition up to the Long shot trigger (< 0.65), so
+    // there's no 0.5-0.65 gap where strong intent + buying stage fell into
+    // "Maybe" (e.g. intent 83%, buying 58%, competition 60% -> Write it).
     if (hasIntent < 0.45){
       verdictCls = 'negative';
       word = 'Skip it.'; rest = "The people searching this aren't the people who'd buy from you — ranking wouldn't matter.";
@@ -668,7 +671,7 @@
       word = 'Long shot.'; rest = 'Right audience, but this one\'s already owned by bigger, older sites.';
       title = 'What it would take to rank for "' + keyword + '"';
       desc = 'The intent is real, but this keyword is dominated by established sites. A newer site writing this exact post is competing uphill — a narrower angle on the same topic has better odds.';
-    } else if (hasIntent >= 0.6 && buyingStage >= 0.55 && tooCompetitive < 0.5){
+    } else if (hasIntent >= 0.6 && buyingStage >= 0.55 && tooCompetitive < 0.65){
       verdictCls = '';
       word = 'Write it.'; rest = 'Real intent, close to a buying decision, and the field is genuinely open.';
       title = 'How "' + keyword + '" should read on ' + domain;
