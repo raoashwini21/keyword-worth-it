@@ -50,10 +50,4 @@ integration) with `@upstash/ratelimit` for the limiter and `SET key value EX 864
 Both modules expose small interfaces (`check(key)`, `get/set`) so they can be swapped without
 touching the handler. Also worth setting a hard monthly spend cap on the Jev and Serper dashboards.
 
-## Tests
-
-```
-npm test
-```
-
-Node ≥ 22.3 (uses the built-in test runner with module mocks; no dependencies).
+**Check it live here:** https://keyword-worth-it.vercel.app/
